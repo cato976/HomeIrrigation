@@ -1,0 +1,12 @@
+framework: netcoreapp2.2
+source https://api.nuget.org/v3/index.json
+
+nuget Microsoft.AspNetCore.App
+nuget Microsoft.AspNetCore.Razor.Design
+nuget Microsoft.NET.Test.Sdk
+nuget NUnit.Runners
+nuget NUnit
+nuget NUnit3TestAdapter
+nuget Should
+nuget EventStore.ClientAPI.NetCore
+nuget Newtonsoft.Json
