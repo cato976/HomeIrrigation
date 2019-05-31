@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -10,9 +10,10 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HomeIrrigation.EventStore\HomeIrrigation.EventStore.csproj" />
-    <ProjectReference Include="..\HomeIrrigation.ESEvents.Common\HomeIrrigation.ESEvents.Common.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.Api\HomeIrrigation.Api.csproj" />
     <ProjectReference Include="..\HomeIrrigation.ESFramework.Common\HomeIrrigation.ESFramework.Common.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.Sprinkler.Service\HomeIrrigation.Sprinkler.Service.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.Data\HomeIrrigation.Data.csproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

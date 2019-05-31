@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\HomeIrrigation.ESFramework.Common\HomeIrrigation.ESFramework.Common.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.ESEvents.Common\HomeIrrigation.ESEvents.Common.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+</Project>

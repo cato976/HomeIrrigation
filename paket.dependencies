@@ -7,6 +7,7 @@ nuget Microsoft.NET.Test.Sdk
 nuget NUnit.Runners
 nuget NUnit
 nuget NUnit3TestAdapter
+nuget Moq
 nuget Should
 nuget EventStore.ClientAPI.NetCore
 nuget Newtonsoft.Json
