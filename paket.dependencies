@@ -11,3 +11,4 @@ nuget Moq
 nuget Should
 nuget EventStore.ClientAPI.NetCore
 nuget Newtonsoft.Json
+nuget log4net
