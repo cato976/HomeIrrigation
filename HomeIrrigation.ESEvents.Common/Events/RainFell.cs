@@ -9,6 +9,7 @@ namespace HomeIrrigation.ESEvents.Common.Events
     {
         public RainFell(Guid aggregateGuid, DateTimeOffset effectiveDateTime, IEventMetadata metadata, double inches) : base(aggregateGuid, effectiveDateTime, metadata)
         {
+            Inches = inches;
         }
 
         [JsonConstructor]
@@ -16,5 +17,7 @@ namespace HomeIrrigation.ESEvents.Common.Events
         {
             Version = version;
         }
+
+        public double Inches { get; private set; }
     }
 }

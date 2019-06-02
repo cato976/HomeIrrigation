@@ -28,6 +28,14 @@ namespace HomeIrrigation.Api.Test
                 eventMetadata, 56));
         }
 
+        [Test]
+        public void Should_Get_Weekly_Rainfall()
+        {
+            PassEventToEventBus(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow,
+                eventMetadata, 56));
+            
+        }
+
         private void PassEventToEventBus(IEvent handledEvent)
         {
             EventStoreHandlerRegistration.RegisterEventHandler(moqEventStore.Object);

@@ -8,6 +8,7 @@ using HomeIrrigation.EventStore.Exceptions;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HomeIrrigation.EventStore
 {
@@ -33,16 +34,12 @@ namespace HomeIrrigation.EventStore
             settings.SetHeartbeatTimeout(TimeSpan.FromSeconds(heartbeatTimeout));
 
             if (useSsl && !String.IsNullOrEmpty(certificateCommonName))
-
             {
-
                 settings.UseSslConnection(certificateCommonName, true);
             }
 
             if (reconnectAttempts > 0)
-
             {
-
                 settings.LimitReconnectionsTo(reconnectAttempts);
                 KeepReconnecting = false;
             }
@@ -59,7 +56,30 @@ namespace HomeIrrigation.EventStore
 
         public List<IEvent> GetAllEvents(CompositeAggregateId aggregateId)
         {
-            throw new NotImplementedException();
+            var eventsList = new List<IEvent>();
+            long sliceStart = 0;
+            StreamEventsSlice currentEventsSlice;
+
+            do
+            {
+                currentEventsSlice = _eventStoreConnection.ReadStreamEventsForwardAsync(aggregateId.CompositeId, sliceStart, 500, false).Result;
+
+                if (currentEventsSlice.Status == SliceReadStatus.StreamNotFound)
+                {
+                    throw new StreamNotFoundException(aggregateId.CompositeId);
+                }
+
+                if (currentEventsSlice.Status == SliceReadStatus.StreamDeleted)
+                {
+                    throw new StreamDeletedException(aggregateId.CompositeId);
+                }
+
+                sliceStart = currentEventsSlice.NextEventNumber;
+
+                eventsList.AddRange(currentEventsSlice.Events.Select(data => data.Event.DeserializeEvent()).Where(@event => @event != null));
+            } while (!currentEventsSlice.IsEndOfStream);
+
+            return eventsList;
         }
 
         public List<IEvent> GetAllEventsToEventIdInclusive(CompositeAggregateId aggregateId, string eventId)
@@ -85,11 +105,8 @@ namespace HomeIrrigation.EventStore
         public void SaveEvents(CompositeAggregateId aggregateId, IEnumerable<IEvent> events)
         {
             foreach (var @event in events)
-
             {
-
                 AppendEventToEventStream(@event, aggregateId);
-
             }
         }
 
@@ -100,36 +117,21 @@ namespace HomeIrrigation.EventStore
             var eventData = GetEventData(@event);
 
             try
-
             {
-
                 TimeSpan timeout = KeepReconnecting ? TimeSpan.FromSeconds(30) : TimeSpan.FromMilliseconds(-1);
-
                 _eventStoreConnection.AppendToStreamAsync(aggregateId.CompositeId, @event.Version, eventData).Wait(timeout);
-
             }
 
             catch (Exception)
-
             {
-
                 throw new ConnectionFailure("Failed to persist event. There may be an issue with the connection to Event Store.");
-
             }
-
         }
-
-
 
         private static EventData GetEventData(IEvent @event)
-
         {
-
             return @event.SerializeEvent();
-
         }
-
-
 
     }
 }
