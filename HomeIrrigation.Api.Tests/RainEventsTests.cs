@@ -19,26 +19,53 @@ namespace HomeIrrigation.Api.Test
         [SetUp]
         public void Setup()
         {
-            eventMetadata = new EventMetadata(Guid.NewGuid(), "TestCategory", "TestCorrelationId", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow);
+            eventMetadata = new EventMetadata(Guid.NewGuid(), "Rain", "TestCorrelationId", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow);
             moqEventStore = new Mock<IEventStore>();
             moqEventStore.Setup(x => x.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()));
         }
 
-        [Test]
-        public void Should_Generate_RainFell_Event_When_Recording_RainFall()
+        [TestCase(6.2)]
+        [TestCase(4.2)]
+        [TestCase(1.2)]
+        public void Should_Generate_RainFell_Event_When_Recording_RainFall(double inches)
         {
-            RainFallCommand cmd = new RainFallCommand(6.2);
+            var eventsList = new List<IEvent>();
+            eventsList.Add(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-9), eventMetadata, 5));
+            eventsList.Add(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow, eventMetadata, inches));
+            moqEventStore.Setup(x => x.GetAllEvents(It.IsAny<CompositeAggregateId>())).Returns((List<IEvent>)eventsList);
+
+            RainFallCommand cmd = new RainFallCommand(inches);
 
             var rain = Domain.Rain.RecordRainfall(eventMetadata, moqEventStore.Object, cmd);
-
             var events = rain.GetUncommittedEvents();
 
             Assert.IsNotEmpty(events);
             Assert.AreEqual(1, events.Count());
             Assert.IsInstanceOf<RainFell>(events.First());
-            var fell = events.First() as RainFell;
-            Assert.AreEqual(6.2, fell.Inches);
+        }
 
+        [TestCase(6.2, 7.4)]
+        [TestCase(4.2, 1.1)]
+        [TestCase(1.2, 4.3)]
+        public void Should_Get_Weekly_RainFall(double inches, double secondRain)
+        {
+            var events = new List<IEvent>();
+            events.Add(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-9), eventMetadata, 5)); // Add some rain for the pass
+            events.Add(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow, eventMetadata, inches));
+            events.Add(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow, eventMetadata, secondRain));
+            moqEventStore.Setup(x => x.GetAllEvents(It.IsAny<CompositeAggregateId>())).Returns((List<IEvent>)events);
+
+            Domain.Rain rain = null;
+            foreach (var item in events)
+            {
+                RainFallCommand cmd = new RainFallCommand(((RainFell)item).Inches);
+
+                rain = Domain.Rain.RecordRainfall(eventMetadata, moqEventStore.Object, cmd);
+            }
+
+            var weeklyRainfall = Domain.Rain.GetWeeklyRainfall(moqEventStore.Object,
+                new CompositeAggregateId(eventMetadata.TenantId, rain.AggregateGuid, eventMetadata.Category));
+            Assert.AreEqual(inches + secondRain, weeklyRainfall);
         }
     }
 }

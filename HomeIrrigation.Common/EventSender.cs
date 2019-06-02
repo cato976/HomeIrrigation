@@ -14,7 +14,7 @@ namespace HomeIrrigation.Common
 
         #region IEventSender
 
-        public static bool SendEvent(IEventStore eventStore, CompositeAggregateId compositeId, IEnumerable<Event> events)
+        public static bool SendEvent(IEventStore eventStore, CompositeAggregateId compositeId, IEnumerable<IEvent> events)
         {
             EventStore = eventStore;
 
@@ -30,7 +30,22 @@ namespace HomeIrrigation.Common
             }
         }
 
+        public static List<IEvent> GetAllEvents(IEventStore eventStore, CompositeAggregateId aggregateId)
+        {
+            EventStore = eventStore;
+
+            try
+            {
+                return EventStore.GetAllEvents(aggregateId);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Exception: {ex.Message} in {Assembly.GetExecutingAssembly().GetName().Name}");
+                throw;
+            }
+        }
+
         #endregion IEventSender
-        
+
     }
 }

@@ -13,7 +13,7 @@ namespace HomeIrrigation.ESFramework.Common.Base
         private int version = -3;
         public int Version { get { return version; } internal set { version = value; } }
 
-        public IEnumerable<Event> GetUncommittedEvents()
+        public IEnumerable<IEvent> GetUncommittedEvents()
         {
             return events;
         }
