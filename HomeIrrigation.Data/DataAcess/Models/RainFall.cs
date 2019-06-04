@@ -7,10 +7,7 @@ namespace HomeIrrigation.Data.DataAccess.Models
 {
     public class RainFall : Aggregate
     {
-        private RainFall()
-        {
-
-        }
+        private RainFall() { }
 
         public RainFall(Guid id, IEventMetadata eventMetadata, double inches)
         {
