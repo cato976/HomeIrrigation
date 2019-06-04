@@ -27,6 +27,7 @@ namespace HomeIrrigation.Api.Test
         [TestCase(6.2)]
         [TestCase(4.2)]
         [TestCase(1.2)]
+        [TestCase(0)]
         public void Should_Generate_RainFell_Event_When_Recording_RainFall(double inches)
         {
             var eventsList = new List<IEvent>();
@@ -47,6 +48,7 @@ namespace HomeIrrigation.Api.Test
         [TestCase(6.2, 7.4)]
         [TestCase(4.2, 1.1)]
         [TestCase(1.2, 4.3)]
+        [TestCase(0, 0)]
         public void Should_Get_Weekly_RainFall(double inches, double secondRain)
         {
             var events = new List<IEvent>();

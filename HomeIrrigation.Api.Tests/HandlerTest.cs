@@ -6,6 +6,9 @@ using NUnit.Framework;
 using HomeIrrigation.ESFramework.Common.Interfaces;
 using HomeIrrigation.ESFramework.Common.Base;
 using HomeIrrigation.ESEvents.Common.Events;
+using HomeIrrigation.Common.Interfaces;
+using HomeIrrigation.Common.CommandBus;
+using HomeIrrigation.Api.DataTransferObjects.Commands.Rain;
 
 namespace HomeIrrigation.Api.Test
 {
@@ -29,6 +32,12 @@ namespace HomeIrrigation.Api.Test
         }
 
         [Test]
+        public void Should_Handle_Rain_Fell_Command()
+        {
+            PassCommandToCommandBus(new RainFallCommand(70));
+        }
+
+        [Test]
         public void Should_Get_Weekly_Rainfall()
         {
             PassEventToEventBus(new RainFell(Guid.NewGuid(), DateTimeOffset.UtcNow,
@@ -41,6 +50,13 @@ namespace HomeIrrigation.Api.Test
             EventStoreHandlerRegistration.RegisterEventHandler(moqEventStore.Object);
             var eventBus = EventBus.Instance;
             eventBus.Execute(handledEvent);
+        }
+
+        private void PassCommandToCommandBus(ICommand handleCommand)
+        {
+            CommandHandlerRegistration.RegisterCommandHandler();
+            var commandBus = CommandBus.Instance;
+            commandBus.Execute(handleCommand);
         }
     }
 }
