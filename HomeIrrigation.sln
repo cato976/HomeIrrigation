@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeIrrigation.Common", "Ho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeIrrigation.Weather.Service", "HomeIrrigation.Weather.Service\HomeIrrigation.Weather.Service.csproj", "{392A0F4A-FBAC-4CBC-8FEC-02D44A94546C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeIrrigation.Weather.Service.Test", "HomeIrrigation.Weather.Service.Test\HomeIrrigation.Weather.Service.Test.csproj", "{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -184,5 +186,17 @@ Global
 		{392A0F4A-FBAC-4CBC-8FEC-02D44A94546C}.Release|x64.Build.0 = Release|Any CPU
 		{392A0F4A-FBAC-4CBC-8FEC-02D44A94546C}.Release|x86.ActiveCfg = Release|Any CPU
 		{392A0F4A-FBAC-4CBC-8FEC-02D44A94546C}.Release|x86.Build.0 = Release|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Debug|x64.Build.0 = Debug|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Release|x64.ActiveCfg = Release|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Release|x64.Build.0 = Release|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDBBEAED-9C7D-42F0-9651-BA39806D51A1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
