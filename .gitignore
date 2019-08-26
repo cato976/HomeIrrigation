@@ -18,3 +18,5 @@ paket-files/paket.locked
 paket-files/paket.restore.cached
 paket.lock
 /TestResults
+/HomeIrrigation.Weather.Service.Test/appsettings.json
+/HomeIrrigation.Weather.Service/appsettings.json
