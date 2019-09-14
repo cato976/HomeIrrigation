@@ -20,3 +20,4 @@ paket.lock
 /TestResults
 /HomeIrrigation.Weather.Service.Test/appsettings.json
 /HomeIrrigation.Weather.Service/appsettings.json
+/HomeIrrigation.Sprinkler.Service.Test/appsettings.json
