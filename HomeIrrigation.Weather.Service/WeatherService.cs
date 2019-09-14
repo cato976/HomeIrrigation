@@ -18,13 +18,14 @@ namespace HomeIrrigation.Weather.Service
                 .SetBasePath(Path.GetDirectoryName(path))
                 .AddJsonFile("appsettings.json", false, true);
             Configuration = builder.Build();
-            var darkSkyKey = Configuration.GetSection("darkskykey").Value;
+            darkSkyKey = Configuration.GetSection("darkskykey").Value;
             weatherUrl = "https://api.darksky.net/forecast/" + darkSkyKey + "/";
         }
 
         HttpClient client;
         private static IConfigurationRoot Configuration;
 
+        string darkSkyKey;
         string weatherUrl;
 
         public double GetCurrentTempuratureF(double latitude, double longitude)
@@ -48,6 +49,33 @@ namespace HomeIrrigation.Weather.Service
             fahrenheit = (double)o["currently"]["temperature"];
 
             return fahrenheit;
+        }
+
+        public double GetRainfallInPastWeek(double latitude, double longitude, DateTimeOffset upToNow)
+        {
+            double rainfall = 0;
+            var handler = new HttpClientHandler();
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback =
+                (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+                };
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+            for(int days = 0; days < 7; days++)
+            {
+                var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-7).ToUnixTimeSeconds();
+
+                HttpResponseMessage response = client.GetAsync(query).Result;
+
+                Task<string> result = response.Content.ReadAsStringAsync();
+                var data = result.Result;
+                JObject o = JObject.Parse(data);
+                rainfall += (double)o["daily"]["data"][0]["precipIntensityMax"];
+            }
+
+            return rainfall;
         }
 
         public static string GetPath()
