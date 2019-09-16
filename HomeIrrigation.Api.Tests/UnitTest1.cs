@@ -4,6 +4,8 @@ using HomeIrrigation.ESFramework.Common.Interfaces;
 using System;
 using Moq;
 using HomeIrrigation.Sprinkler.Service;
+using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace HomeIrrigation.Api.Test
 {
@@ -32,7 +34,10 @@ namespace HomeIrrigation.Api.Test
             // Act
 
             //var unitOfWorkFactory = new UnitOfWorkFactory();
-            var sprinklerService = new SprinklerService();
+            var logger = new Mock<ILogger<HomeIrrigation.Sprinkler.Service.SprinklerService>>();
+            HttpClient client = new HttpClient();
+            var timer = new Mock<ITimer>();
+            var sprinklerService = new SprinklerService(logger.Object, timer.Object, client);
             var rainFall = new Data.DataAccess.Models.RainFall(Guid.NewGuid(), eventMetadata, 4);
             sprinklerService.RecordRain(rainFall);
 
