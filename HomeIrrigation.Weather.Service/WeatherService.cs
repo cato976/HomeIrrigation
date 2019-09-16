@@ -78,7 +78,7 @@ namespace HomeIrrigation.Weather.Service
             return rainfall;
         }
 
-        public static string GetPath()
+        private static string GetPath()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);

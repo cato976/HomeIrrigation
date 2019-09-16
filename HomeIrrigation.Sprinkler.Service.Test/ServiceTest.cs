@@ -14,6 +14,7 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace HomeIrrigation.Sprinkler.Service.Test
 {
@@ -1219,6 +1220,8 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             // In hasn't rain in the past 7 days
             // The lawn has not been watered in the pass 7 days
             //Arrange
+            var mockLogger = new Mock<ILogger>();
+            var scheduler = new Mock<IScheduler>();
             string numberJson = @"
             {
                 ""latitude"": 37.8267,
@@ -1781,11 +1784,10 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var subjectUnderTest = new WeatherService(httpClient);
+            var timer = new Mock<ITimer>();
+            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient);
+            timer.Raise(s => s.Elapsed += null, new object());
             DateTimeOffset now = DateTimeOffset.Now;
-            var result = subjectUnderTest.GetRainfallInPastWeek(37.8267, -122.4233, now);
-            result.ShouldNotBeSameAs(0);
-            result.ShouldBeGreaterThan(0.0007d);
             var darkSkyKey = Configuration.GetSection("darkskykey").Value;
             var expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-7).ToUnixTimeSeconds());
 
@@ -1796,12 +1798,6 @@ namespace HomeIrrigation.Sprinkler.Service.Test
                         req.Method == HttpMethod.Get
                         && req.RequestUri == expectedUri),
                     ItExpr.IsAny<CancellationToken>());
-
-            IrrigationCalculator ir = new IrrigationCalculator();
-            var minutesToIrrigate = ir.HowLongToIrrigate(result, 2);
-
-            // The lawn should be watered for 60 minutes
-            minutesToIrrigate.ShouldEqual(60);
         }
 
         private static string GetPath()

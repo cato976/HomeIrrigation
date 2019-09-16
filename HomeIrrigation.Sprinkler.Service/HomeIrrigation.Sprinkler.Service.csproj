@@ -2,11 +2,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HomeIrrigation.Data\HomeIrrigation.Data.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.Weather.Service\HomeIrrigation.Weather.Service.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <OutputType>Exe</OutputType>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +30,4 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(Configuration) |$(Platform)'=='Debug|AnyCPU'">
-      <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration) |$(Platform)'=='Release|AnyCPU'">
-      <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
 </Project>
