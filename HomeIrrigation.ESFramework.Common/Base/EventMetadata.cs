@@ -12,8 +12,8 @@ namespace HomeIrrigation.ESFramework.Common.Base
 
         }
 
-        public EventMetadata(Guid tenantId, string category, string correlationId, Guid causationId,
-            Guid accountGuid, DateTimeOffset publishedDateTime)
+        public EventMetadata(Guid tenantId, string category, Guid correlationId, Guid causationId,
+            Guid accountGuid)
         {
             if (Guid.Empty == tenantId)
             {
@@ -23,7 +23,7 @@ namespace HomeIrrigation.ESFramework.Common.Base
             {
                 throw new ArgumentNullException(nameof(category));
             }
-            if (string.IsNullOrEmpty(correlationId))
+            if (Guid.Empty == correlationId)
             {
                 throw new ArgumentNullException(nameof(correlationId));
             }
@@ -31,22 +31,18 @@ namespace HomeIrrigation.ESFramework.Common.Base
             {
                 throw new ArgumentException(nameof(accountGuid));
             }
-            if (DateTimeOffset.MinValue == publishedDateTime)
-            {
-                throw new ArgumentException(nameof(publishedDateTime));
-            }
 
             TenantId = tenantId;
             Category = category;
             CorrelationId = correlationId;
             CausationId = causationId;
             AccountGuid = accountGuid;
-            PublishedDateTime = publishedDateTime;
+            PublishedDateTime = DateTime.UtcNow;
         }
 
         public Guid TenantId { get; set; }
         public string Category { get; set; }
-        public string CorrelationId { get; set; }
+        public Guid CorrelationId { get; set; }
         public Guid CausationId { get; set; }
         public Guid AccountGuid { get; set; }
         public DateTimeOffset PublishedDateTime { get; set; }

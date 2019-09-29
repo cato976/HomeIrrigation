@@ -28,6 +28,7 @@ namespace HomeIrrigation.Api.Test
             //var mediStatContext = new MediStatContext();
             //unitOfWorkMock.Setup(x => x.DeviceRepository.Add(It.IsAny<DeviceMap>()));
             //unitOfWorkFactoryMock.Setup(x => x.Create()).Returns(unitOfWorkMock.Object);
+            var eventStoreMock = new Mock<IEventStore>();
 
             var eventMetadata = new EventMetadata();
 
@@ -37,7 +38,7 @@ namespace HomeIrrigation.Api.Test
             var logger = new Mock<ILogger<HomeIrrigation.Sprinkler.Service.SprinklerService>>();
             HttpClient client = new HttpClient();
             var timer = new Mock<ITimer>();
-            var sprinklerService = new SprinklerService(logger.Object, timer.Object, client);
+            var sprinklerService = new SprinklerService(logger.Object, timer.Object, client, eventStoreMock.Object);
             var rainFall = new Data.DataAccess.Models.RainFall(Guid.NewGuid(), eventMetadata, 4);
             sprinklerService.RecordRain(rainFall);
 

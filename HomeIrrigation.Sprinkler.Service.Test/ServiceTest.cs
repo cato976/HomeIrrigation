@@ -9,12 +9,12 @@ using Should;
 using Moq;
 using System.Net.Http;
 using Moq.Protected;
-using System.Configuration;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using HomeIrrigation.ESFramework.Common.Interfaces;
 
 namespace HomeIrrigation.Sprinkler.Service.Test
 {
@@ -1215,7 +1215,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
         }
 
         [Test]
-        public void Given_That_It_Is_5AM_Determine_If_We_To_Water_The_Lawn__We_Should_Water_The_Lawn_For_60_Minutes()
+        public void Given_That_It_Is_5AM_Determine_If_We_Need_To_Water_The_Lawn__We_Should_Water_The_Lawn_For_60_Minutes()
         {
             // In hasn't rain in the past 7 days
             // The lawn has not been watered in the pass 7 days
@@ -1770,6 +1770,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             }";
 
             var httpMessageHandler = new Mock<HttpMessageHandler>();
+            var eventStoreMock = new Mock<IEventStore>();
             httpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
                         ItExpr.IsAny<CancellationToken>())
@@ -1785,11 +1786,11 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var timer = new Mock<ITimer>();
-            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient);
+            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient, eventStoreMock.Object);
             timer.Raise(s => s.Elapsed += null, new object());
             DateTimeOffset now = DateTimeOffset.Now;
             var darkSkyKey = Configuration.GetSection("darkskykey").Value;
-            var expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-7).ToUnixTimeSeconds());
+            var expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.023434,-84.615494" + "," + now.AddDays(-7).ToUnixTimeSeconds());
 
             httpMessageHandler.Protected().Verify(
                     "SendAsync",

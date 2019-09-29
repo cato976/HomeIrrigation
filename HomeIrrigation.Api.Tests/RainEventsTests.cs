@@ -19,7 +19,7 @@ namespace HomeIrrigation.Api.Test
         [SetUp]
         public void Setup()
         {
-            eventMetadata = new EventMetadata(Guid.NewGuid(), "Rain", "TestCorrelationId", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow);
+            eventMetadata = new EventMetadata(Guid.NewGuid(), "Rain", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
             moqEventStore = new Mock<IEventStore>();
             moqEventStore.Setup(x => x.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()));
         }

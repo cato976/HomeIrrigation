@@ -21,31 +21,25 @@ namespace HomeIrrigation.EventStore.Test
         [Test]
         public void EventSerialization_CreateEventMetadata_InvalidTenantId_ShouldThrow_ArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => new EventMetadata(new Guid(), "testCat", "testCor", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow));
+            Assert.Throws<ArgumentException>(() => new EventMetadata(new Guid(), "testCor", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
         }
 
         [Test]
         public void EventSerialization_CreateEventMetadata_InvalidCategory_ShouldThrow_ArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new EventMetadata(Guid.NewGuid(), null, "testCor", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow));
+            Assert.Throws<ArgumentNullException>(() => new EventMetadata(Guid.NewGuid(), null, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
         }
 
         [Test]
         public void EventSerialization_CreateEventMetadata_InvalidCorrelationId_ShouldThrow_ArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new EventMetadata(Guid.NewGuid(), "testCategory", null, Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow));
-        }
-
-        [Test]
-        public void EventSerialization_CreateEventMetadata_InvalidPublishedDateTime_ShouldThrow_ArgumentException()
-        {
-            Assert.Throws<ArgumentException>(() => new EventMetadata(Guid.NewGuid(), "testCategory", "testCorrelationId", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.MinValue));
+            Assert.Throws<ArgumentNullException>(() => new EventMetadata(Guid.NewGuid(), "testCategory", Guid.Empty, Guid.NewGuid(), Guid.NewGuid()));
         }
 
         [Test]
         public void EventSerialization_SerializeRainFellEvent_ShouldDeserialize()
         {
-            var eventMetaData = new EventMetadata(Guid.NewGuid(), "testCat", "testCor", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow);
+            var eventMetaData = new EventMetadata(Guid.NewGuid(), "testCat", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
             var serializableEvent = new RainFell(Guid.NewGuid(), new DateTimeOffset(DateTime.UtcNow), eventMetaData, 2);
 
             var eventData = EventSerialization.SerializeEvent(serializableEvent);
@@ -57,7 +51,7 @@ namespace HomeIrrigation.EventStore.Test
 
             var eventMetadata = metaDataJToken.ToObject<EventMetadata>();
             var deserializedEventData = DeserializeObject(eventDataJson, eventMetadata.CustomMetadata[EventClrTypeHeader]) as IEvent;
-            RainFell castDeserializedEvent = (RainFell) deserializedEventData;
+            RainFell castDeserializedEvent = (RainFell)deserializedEventData;
 
             Assert.IsNotNull(deserializedEventData);
             Assert.AreEqual(serializableEvent.Metadata.AccountGuid, deserializedEventData.Metadata.AccountGuid);
@@ -69,10 +63,10 @@ namespace HomeIrrigation.EventStore.Test
         public void EventSerialization_SerializeDoctorCreatedEvent_ShouldThrow_ArgumentException()
         {
             DateTime date = new DateTime();
-            var eventMetaData = new EventMetadata(Guid.NewGuid(), "testCat", "testCor", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow);
+            var eventMetaData = new EventMetadata(Guid.NewGuid(), "testCat", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
             Assert.Throws<ArgumentException>(() => new RainFell(Guid.NewGuid(), date, eventMetaData, 3));
         }
-        
+
         [Test]
         public void EventSerialization_SerializeDoctorCreatedEvent_ShouldThrow_ArgumentNullException()
         {
