@@ -1215,7 +1215,6 @@ namespace HomeIrrigation.Sprinkler.Service.Test
         }
 
         [Test]
-        [Category("SkipWhenPushing")]
         public void Given_That_It_Is_5AM_Determine_If_We_Need_To_Water_The_Lawn__We_Should_Water_The_Lawn_For_60_Minutes()
         {
             // In hasn't rain in the past 7 days
