@@ -1581,7 +1581,6 @@ namespace HomeIrrigation.Weather.Service.Test
         }
 
         [Test]
-        [Category("SkipWhenPushing")]
         public void Get_Rainfall_In_Pass_7_Days_Should_Get_Rainfall_In_Pass_7_Days()
         {
             HttpClient client = new HttpClient();

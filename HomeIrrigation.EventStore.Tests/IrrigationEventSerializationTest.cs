@@ -17,7 +17,7 @@ namespace HomeIrrigation.EventStore.Test
         public void EventSerialization_SerializeIrrigationZoneStartedEvent_ShouldDeserialize()
         {
             var eventMetaData = new EventMetadata(Guid.NewGuid(), "testCat", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
-            var serializableEvent = new IrrigationZoneStared(Guid.NewGuid(), new DateTimeOffset(DateTime.UtcNow), eventMetaData, 4);
+            var serializableEvent = new IrrigateZoneStared(Guid.NewGuid(), new DateTimeOffset(DateTime.UtcNow), eventMetaData, 4);
 
             var eventData = EventSerialization.SerializeEvent(serializableEvent);
 
@@ -28,7 +28,7 @@ namespace HomeIrrigation.EventStore.Test
 
             var eventMetadata = metaDataJToken.ToObject<EventMetadata>();
             var deserializedEventData = DeserializeObject(eventDataJson, eventMetadata.CustomMetadata[EventClrTypeHeader]) as IEvent;
-            IrrigationZoneStared castDeserializedEvent = (IrrigationZoneStared)deserializedEventData;
+            IrrigateZoneStared castDeserializedEvent = (IrrigateZoneStared)deserializedEventData;
 
             Assert.IsNotNull(deserializedEventData);
             Assert.AreEqual(serializableEvent.Metadata.AccountGuid, deserializedEventData.Metadata.AccountGuid);
