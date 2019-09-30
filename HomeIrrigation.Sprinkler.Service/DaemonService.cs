@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HomeIrrigation.ESFramework.Common.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,15 +13,17 @@ namespace HomeIrrigation.Sprinkler.Service
     {
         private readonly ILogger _logger;
         private readonly IOptions<DaemonConfig> _config;
-        private HttpClient _httpClient;
-        private ITimer _timer;
+        private IOptions<HttpClient> _httpClient;
+        private Timer _timer;
+        private IEventStore _eventStore;
 
-        public DaemonService(ILogger<DaemonService> logger, IOptions<DaemonConfig> config, ITimer timer, HttpClient httpClient)
+        public DaemonService(ILogger<DaemonService> logger, IOptions<DaemonConfig> config, IOptions<Timer> timer, IOptions<HttpClient> httpClient, IEventStore eventStore)
         {
             _logger = logger;
             _config = config;
             _httpClient = httpClient;
-            _timer = timer;
+            _timer = (Timer)timer.Value;
+            _eventStore = eventStore;
         }
 
 #region IHostedService
@@ -29,7 +32,7 @@ namespace HomeIrrigation.Sprinkler.Service
         {
             _logger.LogInformation("Starting daemon: " + _config.Value.DaemonName);
             // Start the timer
-            var sp = new SprinklerService(_logger, _timer, _httpClient);
+            var sp = new SprinklerService(_logger, _timer, _httpClient.Value, _eventStore);
 
             return Task.CompletedTask;
         }

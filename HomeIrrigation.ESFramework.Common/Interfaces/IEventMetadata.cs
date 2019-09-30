@@ -8,7 +8,7 @@ namespace HomeIrrigation.ESFramework.Common.Interfaces
     {
         Guid TenantId { get; set; }
         string Category { get; set; }
-        string CorrelationId { get; set; }
+        Guid CorrelationId { get; set; }
         Guid CausationId { get; set; }
         Guid AccountGuid { get; set; }
         DateTimeOffset PublishedDateTime { get; set; }

@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HomeIrrigation.Data\HomeIrrigation.Data.csproj" />
     <ProjectReference Include="..\HomeIrrigation.Weather.Service\HomeIrrigation.Weather.Service.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.Common\HomeIrrigation.Common.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

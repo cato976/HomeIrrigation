@@ -21,7 +21,7 @@ namespace HomeIrrigation.Api.Test
         public void Setup()
         {
             moqEventStore = new Mock<IEventStore>();
-            eventMetadata = new EventMetadata(Guid.NewGuid(), "TestCategory", "TestCorrelationId", Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow);
+            eventMetadata = new EventMetadata(Guid.NewGuid(), "TestCategory", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
         }
 
         [Test]
