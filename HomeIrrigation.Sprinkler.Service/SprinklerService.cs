@@ -12,12 +12,14 @@ using Newtonsoft.Json;
 using HomeIrrigation.ESFramework.Common.Base;
 using HomeIrrigation.ESFramework.Common.Interfaces;
 using HomeIrrigation.Sprinkler.Service.Domain;
+using HomeIrrigation.Sprinkler.Service.DataTransferObjects.Commands.Irrigation;
+using HomeIrrigation.Sprinkler.Service.Handlers;
 
 namespace HomeIrrigation.Sprinkler.Service
 {
     public class SprinklerService
     {
-        public SprinklerService(ILogger logger, ITimer timer, HttpClient httpClient, IEventStore eventStore)
+        public SprinklerService(ILogger logger, ITimer timer, HttpClient httpClient, IEventStore eventStore, Guid tenantId)
         {
             _logger = logger;
             _httpClient = httpClient;
@@ -26,6 +28,7 @@ namespace HomeIrrigation.Sprinkler.Service
             _realTimer = new System.Threading.Timer(SchedulerCallback);
             _timer.SetRealTimer(_realTimer);
             EventStore = eventStore;
+            TenantId = tenantId;
             string path = GetPath();
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Path.GetDirectoryName(path))
@@ -33,6 +36,7 @@ namespace HomeIrrigation.Sprinkler.Service
             Configuration = builder.Build();
             GetInterval();
             ChangeSchedule();
+            CommandHandlerRegistration.RegisterCommandHandler();
         }
 
         private readonly ILogger _logger;
@@ -42,6 +46,7 @@ namespace HomeIrrigation.Sprinkler.Service
         private HttpClient _httpClient;
         private static IConfigurationRoot Configuration;
         private IEventStore EventStore;
+        private Guid TenantId;
 
         public void RecordRain(RainFall rainFall)
         {
@@ -88,7 +93,10 @@ namespace HomeIrrigation.Sprinkler.Service
 
             var result = weatherService.GetRainfallInPastWeek(double.Parse(Configuration.GetSection("Latitude").Value), double.Parse(Configuration.GetSection("Longitude").Value), now);
             var irrigateFor = s.HowLongToIrrigate(result, 0);
-            var eventMetadata = new EventMetadata();
+            var eventMetadata = new EventMetadata()
+            {
+                TenantId = TenantId
+            };
             RunSprinklerCycle(irrigateFor, eventMetadata);
             GetInterval();
             ChangeSchedule();
@@ -96,9 +104,10 @@ namespace HomeIrrigation.Sprinkler.Service
 
         private void RunSprinklerCycle(double howLongToIrrigate, IEventMetadata eventMetadata)
         {
-            using (StreamReader file = File.OpenText(Path.GetDirectoryName(GetPath()) + @"\appsettings.json"))
+            using (StreamReader file = File.OpenText(Path.GetDirectoryName(GetPath()) + @"/appsettings.json"))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
+                _logger.LogInformation("appsettings.json file opened");
                 JObject o2 = (JObject)JToken.ReadFrom(reader);
                 dynamic obj = JsonConvert.DeserializeObject(o2.ToString());
                 foreach (var zone in obj["IrrigationZones"])
@@ -110,8 +119,14 @@ namespace HomeIrrigation.Sprinkler.Service
 
         private void StartIrrigationForZone(Guid zoneNumber, double howLongToIrrigate, IEventMetadata eventMetadata)
         {
-            Zone zone = new Zone(EventStore, zoneNumber);
-            zone.StartIrrigation(howLongToIrrigate, eventMetadata);
+            Zone zone = new Zone(zoneNumber, EventStore);
+            var irrigate = new StartIrrigationCommand()
+            {
+                Zone = zoneNumber,
+                TenantId = eventMetadata.TenantId
+            };
+
+            zone.StartIrrigation(irrigate, eventMetadata);
         }
 
         private static string GetPath()
@@ -120,6 +135,15 @@ namespace HomeIrrigation.Sprinkler.Service
             UriBuilder uri = new UriBuilder(codeBase);
             var path = Uri.UnescapeDataString(uri.Path);
             return path;
+        }
+
+        class ZoneJSON
+        {
+            [JsonProperty]
+            public Guid Number { get; set; }
+
+            [JsonProperty]
+            public string Name { get; set; }
         }
     }
 }

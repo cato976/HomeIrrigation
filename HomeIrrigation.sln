@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeIrrigation.Sprinkler.Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeIrrigation.Sprinkler.Service.ConsoleApp", "HomeIrrigation.Sprinkler.Service.ConsoleApp\HomeIrrigation.Sprinkler.Service.ConsoleApp.csproj", "{B1391E10-22C1-4235-ACEC-2D1CB9BCFE58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irrigation.Common", "Irrigation.Common\Irrigation.Common.csproj", "{5D5AE690-B5B0-4056-9FD5-620B23698FCE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -226,5 +228,17 @@ Global
 		{B1391E10-22C1-4235-ACEC-2D1CB9BCFE58}.Release|x64.Build.0 = Release|Any CPU
 		{B1391E10-22C1-4235-ACEC-2D1CB9BCFE58}.Release|x86.ActiveCfg = Release|Any CPU
 		{B1391E10-22C1-4235-ACEC-2D1CB9BCFE58}.Release|x86.Build.0 = Release|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Release|x64.Build.0 = Release|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D5AE690-B5B0-4056-9FD5-620B23698FCE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

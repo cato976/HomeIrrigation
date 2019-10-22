@@ -15,12 +15,20 @@ using System.Reflection;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using HomeIrrigation.ESFramework.Common.Interfaces;
+using HomeIrrigation.Sprinkler.Service.DataTransferObjects.Commands.Irrigation;
+using HomeIrrigation.ESFramework.Common.Base;
+using System.Collections.Generic;
+using HomeIrrigation.Common.Interfaces;
+using HomeIrrigation.Sprinkler.Service.Handlers;
+using HomeIrrigation.Common.CommandBus;
 
 namespace HomeIrrigation.Sprinkler.Service.Test
 {
     public class ServiceTest
     {
         private static IConfigurationRoot Configuration;
+        Mock<IEventMetadata> moqEventMetadata;
+        Mock<IEventStore> moqEventStore;
 
         [SetUp]
         public void Setup()
@@ -30,6 +38,14 @@ namespace HomeIrrigation.Sprinkler.Service.Test
                 .SetBasePath(Path.GetDirectoryName(path))
                 .AddJsonFile("appsettings.json", false, true);
             Configuration = builder.Build();
+
+            moqEventMetadata = new Mock<IEventMetadata>();
+            moqEventMetadata.Setup(x => x.Category).Returns("Zone");
+            moqEventMetadata.SetupProperty(x => x.PublishedDateTime);
+            moqEventMetadata.Setup(tenantId => tenantId.TenantId).Returns(Guid.NewGuid());
+
+            moqEventStore = new Mock<IEventStore>();
+            moqEventStore.Setup(x => x.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()));
         }
 
         [Test]
@@ -1771,6 +1787,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
 
             var httpMessageHandler = new Mock<HttpMessageHandler>();
             var eventStoreMock = new Mock<IEventStore>();
+            moqEventMetadata.Setup(Id => Id.TenantId).Returns(Guid.NewGuid());
             httpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
                         ItExpr.IsAny<CancellationToken>())
@@ -1786,7 +1803,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var timer = new Mock<ITimer>();
-            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient, eventStoreMock.Object);
+            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient, eventStoreMock.Object, moqEventMetadata.Object.TenantId);
             timer.Raise(s => s.Elapsed += null, new object());
             DateTimeOffset now = DateTimeOffset.Now;
             var darkSkyKey = Configuration.GetSection("darkskykey").Value;
@@ -1799,6 +1816,25 @@ namespace HomeIrrigation.Sprinkler.Service.Test
                         req.Method == HttpMethod.Get
                         && req.RequestUri == expectedUri),
                     ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Test]
+        public void Start_Irrigatio_Should_Send_One_Event_To_EventStore()
+        {
+            CommandHandlerRegistration.RegisterCommandHandler();
+
+            var tenantId = Guid.NewGuid();
+            StartIrrigationCommand cmd = new StartIrrigationCommand()
+            {
+                Zone = Guid.NewGuid(),
+                TenantId = tenantId
+            };
+            moqEventMetadata.Setup(Id => Id.TenantId).Returns(tenantId);
+
+            var zone = new Domain.Zone(cmd.Zone, moqEventStore.Object);
+            zone.StartIrrigation(cmd, moqEventMetadata.Object);
+
+            moqEventStore.Verify(m => m.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()), Times.Once);
         }
 
         private static string GetPath()

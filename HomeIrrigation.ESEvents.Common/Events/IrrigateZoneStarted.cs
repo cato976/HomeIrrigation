@@ -1,0 +1,21 @@
+using System;
+using HomeIrrigation.ESFramework.Common.Base;
+using HomeIrrigation.ESFramework.Common.Interfaces;
+using Newtonsoft.Json;
+
+namespace HomeIrrigation.ESEvents.Common.Events
+{
+    public class IrrigateZoneStarted : Event
+    {
+        public IrrigateZoneStarted(Guid aggregateGuid, DateTimeOffset effectiveDateTime, IEventMetadata metadata) : base(aggregateGuid, effectiveDateTime, metadata)
+        {
+            AggregateGuid = aggregateGuid;
+        }
+
+        [JsonConstructor]
+        private IrrigateZoneStarted(Guid aggregateGuid, string effectiveDateTime, string baseContentGuid, string description, EventMetadata metadata, int version) : this(aggregateGuid, DateTimeOffset.Parse(effectiveDateTime), metadata)
+        {
+            Version = version;
+        }
+    }
+}

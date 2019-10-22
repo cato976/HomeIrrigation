@@ -30,7 +30,7 @@ namespace HomeIrrigation.Api.Test
             var logger = new Mock<ILogger<HomeIrrigation.Sprinkler.Service.SprinklerService>>();
             HttpClient client = new HttpClient();
             var timer = new Mock<ITimer>();
-            var sprinklerService = new SprinklerService(logger.Object, timer.Object, client, eventStoreMock.Object);
+            var sprinklerService = new SprinklerService(logger.Object, timer.Object, client, eventStoreMock.Object, eventMetadata.TenantId);
             var rainFall = new Data.DataAccess.Models.RainFall(Guid.NewGuid(), eventMetadata, 4);
             sprinklerService.RecordRain(rainFall);
 
