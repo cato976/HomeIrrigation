@@ -2,8 +2,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HomeIrrigation.Data\HomeIrrigation.Data.csproj" />
+    <ProjectReference Include="..\HomeIrrigation.EventStore\HomeIrrigation.EventStore.csproj" />
     <ProjectReference Include="..\HomeIrrigation.Weather.Service\HomeIrrigation.Weather.Service.csproj" />
     <ProjectReference Include="..\HomeIrrigation.Common\HomeIrrigation.Common.csproj" />
+    <ProjectReference Include="..\Irrigation.Common\Irrigation.Common.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

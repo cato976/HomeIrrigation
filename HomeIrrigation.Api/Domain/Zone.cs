@@ -9,29 +9,23 @@ namespace HomeIrrigation.Api.Domain
 {
     public class Zone : Aggregate
     {
-        public Zone()
-        {
-        }
-
         public IEventStore EventStore { get; set; }
-        public int Number { get; set; }
 
         public void IrrigateZone(IEventMetadata eventMetadata, IEventStore eventStore, IrrigateZoneCommand cmd)
         {
             EventStore = eventStore;
 
             eventMetadata.PublishedDateTime = DateTimeOffset.UtcNow;
-            ApplyEvent(new IrrigateZoneStared(cmd.Id, DateTimeOffset.UtcNow, eventMetadata, cmd.Zone));
+            ApplyEvent(new IrrigateZoneStarted(cmd.Id, DateTimeOffset.UtcNow, eventMetadata));
 
             // Send Event to Event Store
             var events = this.GetUncommittedEvents();
             EventSender.SendEvent(EventStore, new CompositeAggregateId(eventMetadata.TenantId, AggregateGuid, eventMetadata.Category), events);
         }
 
-        private void Apply(IrrigateZoneStared e)
+        private void Apply(IrrigateZoneStarted e)
         {
             AggregateGuid = e.AggregateGuid;
-            Number = e.Zone;
         }
     }
 }
