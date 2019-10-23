@@ -93,6 +93,7 @@ namespace HomeIrrigation.Sprinkler.Service
 
             var result = weatherService.GetRainfallInPastWeek(double.Parse(Configuration.GetSection("Latitude").Value), double.Parse(Configuration.GetSection("Longitude").Value), now);
             var irrigateFor = s.HowLongToIrrigate(result, 0);
+            _logger.LogInformation($"Irrigate for {irrigateFor} minutes");
             var eventMetadata = new EventMetadata()
             {
                 TenantId = TenantId
