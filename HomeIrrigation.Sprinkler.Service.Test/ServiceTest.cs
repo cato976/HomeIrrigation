@@ -1834,7 +1834,35 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             var zone = new Domain.Zone(cmd.Zone, moqEventStore.Object);
             zone.StartIrrigation(cmd, moqEventMetadata.Object);
 
-            moqEventStore.Verify(m => m.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()), Times.Once);
+            moqEventStore.Verify(m => m.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()), Times.Exactly(2));
+        }
+
+        [Test]
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        public void Start_Irrigatio_Should_Run_For_X_Minutes(int irrigationTime)
+        {
+            CommandHandlerRegistration.RegisterCommandHandler();
+
+            var tenantId = Guid.NewGuid();
+            StartIrrigationCommand cmd = new StartIrrigationCommand()
+            {
+                Zone = Guid.NewGuid(),
+                TenantId = tenantId,
+                HowLongToIrrigate = irrigationTime
+            };
+            moqEventMetadata.Setup(Id => Id.TenantId).Returns(tenantId);
+
+            DateTimeOffset startTimer = DateTimeOffset.UtcNow;
+
+            var zone = new Domain.Zone(cmd.Zone, moqEventStore.Object);
+            zone.StartIrrigation(cmd, moqEventMetadata.Object);
+
+            DateTimeOffset endTime = DateTimeOffset.UtcNow;
+            TimeSpan timeSpan = endTime - startTimer;
+
+            timeSpan.Minutes.ShouldBeGreaterThanOrEqualTo(cmd.HowLongToIrrigate);
         }
 
         [Test]
@@ -2408,7 +2436,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             var timer = new Mock<ITimer>();
             var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient, eventStoreMock.Object, moqEventMetadata.Object.TenantId);
             timer.Raise(s => s.Elapsed += null, new object());
-            eventStoreMock.Verify(m => m.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()), Times.Exactly(3));
+            eventStoreMock.Verify(m => m.SaveEvents(It.IsAny<CompositeAggregateId>(), It.IsAny<IEnumerable<IEvent>>()), Times.Exactly(6));
         }
 
         private static string GetPath()

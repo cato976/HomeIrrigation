@@ -23,7 +23,22 @@ namespace HomeIrrigation.Sprinkler.Service.Handlers
 
             // Process
             var zone = new Zone(message.Id);
-            zone.IrrigateZone(eventMetadata, message.EventStore);
+            zone.IrrigateZone(eventMetadata, message.EventStore, message.HowLongToIrrigate);
+        }
+
+        public void Handle(StopIrrigation message)
+        {
+            var eventMetadata = new EventMetadata(message.TenantId, "IRRIGATION", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+            
+            // Validation 
+            if (Guid.Empty == message.Id)
+            {
+                throw new ArgumentException(nameof(message.Id));
+            }
+
+            // Process
+            var zone = new Zone(message.Id);
+            zone.StopZone(eventMetadata, message.EventStore);
         }
     }
 }

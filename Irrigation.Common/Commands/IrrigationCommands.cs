@@ -19,4 +19,18 @@ namespace Irrigation.Common.Commands
         public int HowLongToIrrigate { get; private set; }
         public IEventStore EventStore { get; private set; }
     }
+    
+    public class StopIrrigation : ICommand
+    {
+        public StopIrrigation(Guid tenantId, Guid id, IEventStore eventStore)
+        {
+            TenantId = tenantId;
+            Id = id;
+            EventStore = eventStore;
+        }
+        
+        public Guid TenantId { get; private set; }
+        public Guid Id { get; private set; }
+        public IEventStore EventStore { get; private set; }
+    }
 }
