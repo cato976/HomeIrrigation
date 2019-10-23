@@ -31,13 +31,34 @@ namespace HomeIrrigation.Sprinkler.Service.Domain
             commandBus.Execute(startIrrigationCommand);
         }
 
-        public void IrrigateZone(IEventMetadata eventMetadata, IEventStore eventStore)
+        public void IrrigateZone(IEventMetadata eventMetadata, IEventStore eventStore, int irrigationTime)
         {
             EventStore = eventStore;
 
             eventMetadata.PublishedDateTime = DateTimeOffset.UtcNow;
             ApplyEvent(new IrrigateZoneStarted(AggregateGuid, DateTimeOffset.UtcNow, eventMetadata));
 
+            StartZone();
+
+            // Send Event to Event Store
+            var events = this.GetUncommittedEvents();
+            EventSender.SendEvent(EventStore, new CompositeAggregateId(eventMetadata.TenantId, AggregateGuid, eventMetadata.Category), events);
+
+            System.Threading.Thread.Sleep(irrigationTime * 1000 * 60);
+
+            var stopIrrigationCommand = new StopIrrigation(eventMetadata.TenantId, AggregateGuid, EventStore);
+            var commandBus = CommandBus.Instance;
+            commandBus.Execute(stopIrrigationCommand);
+        }
+
+        private void StartZone()
+        {
+            
+        }
+
+        public void StopZone(IEventMetadata eventMetadata, IEventStore eventStore)
+        {
+            EventStore = eventStore;
             // Send Event to Event Store
             var events = this.GetUncommittedEvents();
             EventSender.SendEvent(EventStore, new CompositeAggregateId(eventMetadata.TenantId, AggregateGuid, eventMetadata.Category), events);

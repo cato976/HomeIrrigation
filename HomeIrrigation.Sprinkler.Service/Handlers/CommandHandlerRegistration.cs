@@ -11,6 +11,7 @@ namespace HomeIrrigation.Sprinkler.Service.Handlers
             var commandBus = CommandBus.Instance;
             commandBus.RemoveHandlers();
             commandBus.RegisterHandler<StartIrrigation>(irrigationHandlers.Handle);
+            commandBus.RegisterHandler<StopIrrigation>(irrigationHandlers.Handle);
         }
     }
     
