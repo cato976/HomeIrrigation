@@ -6,6 +6,6 @@ namespace HomeIrrigation.Sprinkler.Service.DataTransferObjects.Commands.Irrigati
     {
         public Guid TenantId { get; set; }
         public Guid Zone { get; set; }
-        public int HowLongToIrrigate { get; set; }
+        public double HowLongToIrrigate { get; set; }
     }
 }

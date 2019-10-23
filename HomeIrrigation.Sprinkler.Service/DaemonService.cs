@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace HomeIrrigation.Sprinkler.Service
 {
-    public class DaemonService : IHostedService, IDisposable
+    public class DaemonService : IHostedService
     {
         private readonly ILogger _logger;
         private readonly IOptions<DaemonConfig> _config;
@@ -18,6 +18,7 @@ namespace HomeIrrigation.Sprinkler.Service
         private Timer _timer;
         private static EventStoreImplementation EventStore { get; set; }
         private static Guid TenantId { get; set; }
+        private SprinklerService sprinklerService;
         
         public DaemonService(ILogger<DaemonService> logger, IOptions<DaemonConfig> config, IOptions<Timer> timer, IOptions<HttpClient> httpClient)
         {
@@ -35,7 +36,7 @@ namespace HomeIrrigation.Sprinkler.Service
 
             ConnectToEventStore(_config.Value);;
             // Start the timer
-            var sp = new SprinklerService(_logger, _timer, _httpClient.Value, EventStore, TenantId);
+            sprinklerService = new SprinklerService(_logger, _timer, _httpClient.Value, EventStore, TenantId);
 
             return Task.CompletedTask;
         }
@@ -47,15 +48,6 @@ namespace HomeIrrigation.Sprinkler.Service
         }
 
         #endregion IHostedService
-
-        #region IDisposable
-
-        public void Dispose()
-        {
-            _logger.LogInformation("Disposing...");
-        }
-
-        #endregion IDisposable
 
         private static void ConnectToEventStore(DaemonConfig config)
         {

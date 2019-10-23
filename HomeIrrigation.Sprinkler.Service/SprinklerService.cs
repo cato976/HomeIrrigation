@@ -124,7 +124,8 @@ namespace HomeIrrigation.Sprinkler.Service
             var irrigate = new StartIrrigationCommand()
             {
                 Zone = zoneNumber,
-                TenantId = eventMetadata.TenantId
+                TenantId = eventMetadata.TenantId,
+                HowLongToIrrigate = howLongToIrrigate
             };
 
             zone.StartIrrigation(irrigate, eventMetadata);
@@ -136,6 +137,11 @@ namespace HomeIrrigation.Sprinkler.Service
             UriBuilder uri = new UriBuilder(codeBase);
             var path = Uri.UnescapeDataString(uri.Path);
             return path;
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
 
         class ZoneJSON

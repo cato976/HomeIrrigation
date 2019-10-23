@@ -6,7 +6,7 @@ namespace Irrigation.Common.Commands
 {
     public class StartIrrigation : ICommand
     {
-        public StartIrrigation(Guid tenantId, Guid id, int howLongToIrrigate, IEventStore eventStore)
+        public StartIrrigation(Guid tenantId, Guid id, double howLongToIrrigate, IEventStore eventStore)
         {
             TenantId = tenantId;
             Id = id;
@@ -16,7 +16,7 @@ namespace Irrigation.Common.Commands
         
         public Guid TenantId { get; private set; }
         public Guid Id { get; private set; }
-        public int HowLongToIrrigate { get; private set; }
+        public double HowLongToIrrigate { get; private set; }
         public IEventStore EventStore { get; private set; }
     }
     

@@ -23,15 +23,17 @@ namespace HomeIrrigation.Sprinkler.Service.Domain
         }
 
         private IEventStore EventStore { get; set; }
+        private IEventMetadata EventMetadata { get; set; }
 
         public void StartIrrigation(StartIrrigationCommand cmd, IEventMetadata eventMetadata)
         {
+            EventMetadata = eventMetadata;
             var startIrrigationCommand = new StartIrrigation(cmd.TenantId, cmd.Zone, cmd.HowLongToIrrigate, EventStore);
             var commandBus = CommandBus.Instance;
             commandBus.Execute(startIrrigationCommand);
         }
 
-        public void IrrigateZone(IEventMetadata eventMetadata, IEventStore eventStore, int irrigationTime)
+        public void IrrigateZone(IEventMetadata eventMetadata, IEventStore eventStore, double irrigationTime)
         {
             EventStore = eventStore;
 
@@ -44,7 +46,7 @@ namespace HomeIrrigation.Sprinkler.Service.Domain
             var events = this.GetUncommittedEvents();
             EventSender.SendEvent(EventStore, new CompositeAggregateId(eventMetadata.TenantId, AggregateGuid, eventMetadata.Category), events);
 
-            System.Threading.Thread.Sleep(irrigationTime * 1000 * 60);
+            System.Threading.Thread.Sleep((int)irrigationTime * 1000 * 60);
 
             var stopIrrigationCommand = new StopIrrigation(eventMetadata.TenantId, AggregateGuid, EventStore);
             var commandBus = CommandBus.Instance;
@@ -59,6 +61,10 @@ namespace HomeIrrigation.Sprinkler.Service.Domain
         public void StopZone(IEventMetadata eventMetadata, IEventStore eventStore)
         {
             EventStore = eventStore;
+
+            eventMetadata.PublishedDateTime = DateTimeOffset.UtcNow;
+            ApplyEvent(new IrrigateZoneStopped(AggregateGuid, DateTimeOffset.UtcNow, eventMetadata));
+
             // Send Event to Event Store
             var events = this.GetUncommittedEvents();
             EventSender.SendEvent(EventStore, new CompositeAggregateId(eventMetadata.TenantId, AggregateGuid, eventMetadata.Category), events);
