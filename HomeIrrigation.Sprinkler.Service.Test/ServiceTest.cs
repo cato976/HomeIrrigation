@@ -1862,7 +1862,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             DateTimeOffset endTime = DateTimeOffset.UtcNow;
             TimeSpan timeSpan = endTime - startTimer;
 
-            timeSpan.Minutes.ShouldBeGreaterThanOrEqualTo(cmd.HowLongToIrrigate);
+            timeSpan.Minutes.ShouldBeGreaterThanOrEqualTo((int)cmd.HowLongToIrrigate);
         }
 
         [Test]
