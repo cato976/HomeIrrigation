@@ -18,6 +18,7 @@ using System.Reflection;
 
 namespace HomeIrrigation.Weather.Service.Test
 {
+    [Parallelizable(ParallelScope.Children)]
     public class WeatherServiceTest
     {
         private static IConfigurationRoot Configuration;

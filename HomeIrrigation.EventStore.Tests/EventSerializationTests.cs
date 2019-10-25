@@ -9,6 +9,7 @@ using HomeIrrigation.ESFramework.Common.Interfaces;
 
 namespace HomeIrrigation.EventStore.Test
 {
+    [Parallelizable(ParallelScope.Children)]
     public class EventSerializationTests
     {
         public static string EventClrTypeHeader = "EventClrTypeName";

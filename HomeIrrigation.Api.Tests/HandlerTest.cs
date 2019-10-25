@@ -12,6 +12,7 @@ using HomeIrrigation.Api.DataTransferObjects.Commands.Rain;
 
 namespace HomeIrrigation.Api.Test
 {
+    [Parallelizable(ParallelScope.Fixtures)]
     public class HandlerTest
     {
         Mock<IEventStore> moqEventStore;
