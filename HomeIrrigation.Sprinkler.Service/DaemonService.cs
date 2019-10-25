@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HomeIrrigation.ESFramework.Common.Interfaces;
 using HomeIrrigation.EventStore;
+using HomeIrrigation.Sprinkler.Service.Handlers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,8 @@ namespace HomeIrrigation.Sprinkler.Service
         {
             _logger.LogInformation("Starting daemon: " + _config.Value.DaemonName);
 
-            ConnectToEventStore(_config.Value);;
+            ConnectToEventStore(_config.Value);
+            EventStoreHandlerRegistration.RegisterEventHandler(EventStore);
             // Start the timer
             sprinklerService = new SprinklerService(_logger, _timer, _httpClient.Value, EventStore, TenantId);
 
@@ -44,6 +46,7 @@ namespace HomeIrrigation.Sprinkler.Service
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Stopping daemon.");
+            sprinklerService.Dispose();
             return Task.CompletedTask;
         }
 

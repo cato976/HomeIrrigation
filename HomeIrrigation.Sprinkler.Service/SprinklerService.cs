@@ -17,7 +17,7 @@ using HomeIrrigation.Sprinkler.Service.Handlers;
 
 namespace HomeIrrigation.Sprinkler.Service
 {
-    public class SprinklerService
+    public class SprinklerService : IDisposable
     {
         public SprinklerService(ILogger logger, ITimer timer, HttpClient httpClient, IEventStore eventStore, Guid tenantId)
         {
@@ -45,7 +45,7 @@ namespace HomeIrrigation.Sprinkler.Service
         private DateTime scheduledTime = DateTime.MinValue;
         private HttpClient _httpClient;
         private static IConfigurationRoot Configuration;
-        private IEventStore EventStore;
+        private static IEventStore EventStore;
         private Guid TenantId;
 
         public void RecordRain(RainFall rainFall)
@@ -96,7 +96,8 @@ namespace HomeIrrigation.Sprinkler.Service
             _logger.LogInformation($"Irrigate for {irrigateFor} minutes");
             var eventMetadata = new EventMetadata()
             {
-                TenantId = TenantId
+                TenantId = TenantId,
+                Category = "IRRIGATION"
             };
             RunSprinklerCycle(irrigateFor, eventMetadata);
             GetInterval();
@@ -125,7 +126,7 @@ namespace HomeIrrigation.Sprinkler.Service
             {
                 Zone = zoneNumber,
                 TenantId = eventMetadata.TenantId,
-                HowLongToIrrigate = howLongToIrrigate
+                HowLongToIrrigate = howLongToIrrigate,
             };
 
             zone.StartIrrigation(irrigate, eventMetadata);
@@ -139,10 +140,43 @@ namespace HomeIrrigation.Sprinkler.Service
             return path;
         }
 
+        private void StopAnyRunningZones()
+        {
+            using (StreamReader file = File.OpenText(Path.GetDirectoryName(GetPath()) + @"/appsettings.json"))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                Repository<Zone> zoneRepo = new Repository<Zone>(EventStore);
+                JObject o2 = (JObject)JToken.ReadFrom(reader);
+                dynamic obj = JsonConvert.DeserializeObject(o2.ToString());
+                foreach (var zone in obj["IrrigationZones"])
+                {
+                    var found = zoneRepo.GetById(new CompositeAggregateId(TenantId, Guid.Parse(zone["Number"].Value),
+                        "IRRIGATION"));
+                    if(found != null)
+                    {
+                        if (found.State == Enumerations.ZoneState.Running)
+                        {
+                            var irrigate = new StopIrrigationCommand()
+                            {
+                                Zone = found.AggregateGuid,
+                                TenantId = found.EventMetadata.TenantId,
+                            };
+                            found.StopIrrigation(irrigate, found.EventMetadata);
+                            //found.StopZone(found.EventMetadata, EventStore, found.EventMetadata.EventNumber);
+                        }
+                    }
+                }
+            }
+        }
+
+        #region IDisposable
+
         public void Dispose()
         {
-            throw new NotImplementedException();
+            StopAnyRunningZones();
         }
+
+        #endregion IDisposable
 
         class ZoneJSON
         {

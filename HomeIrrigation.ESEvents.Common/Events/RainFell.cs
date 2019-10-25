@@ -15,7 +15,7 @@ namespace HomeIrrigation.ESEvents.Common.Events
         [JsonConstructor]
         private RainFell(Guid aggregateGuid, string effectiveDateTime, string baseContentGuid, string description, EventMetadata metadata, double inches, int version) : this(aggregateGuid, DateTimeOffset.Parse(effectiveDateTime), metadata, inches)
         {
-            Version = version;
+            ExpectedVersion = version;
         }
 
         public double Inches { get; private set; }

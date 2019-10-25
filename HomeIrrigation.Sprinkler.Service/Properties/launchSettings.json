@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HomeIrrigation.Sprinkler.Service": {
+      "commandName": "Project",
+      "commandLineArgs": "--Daemon:DaemonName=\"Sprinkler Daemon\" --Daemon:EventStoreURL=127.0.0.1 --Daemon:EventStoreTcpPort=1113 --Daemon:EventStoreHeartbeatInterval=5000 --Daemon:EventStoreHeartbeatTimeout=10000 --Daemon:EventStoreUser=admin --Daemon:EventStorePassword=changeit --Daemon:TenantId=ab723f29-a313-44c9-974a-c7b5bbf86ca0"
+    }
+  }
+}

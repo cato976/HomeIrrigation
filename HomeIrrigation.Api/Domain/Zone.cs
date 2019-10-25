@@ -16,7 +16,7 @@ namespace HomeIrrigation.Api.Domain
             EventStore = eventStore;
 
             eventMetadata.PublishedDateTime = DateTimeOffset.UtcNow;
-            ApplyEvent(new IrrigateZoneStarted(cmd.Id, DateTimeOffset.UtcNow, eventMetadata));
+            ApplyEvent(new IrrigateZoneStarted(cmd.Id, DateTimeOffset.UtcNow, eventMetadata, cmd.HowLongToIrrigate));
 
             // Send Event to Event Store
             var events = this.GetUncommittedEvents();

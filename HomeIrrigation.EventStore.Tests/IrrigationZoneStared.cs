@@ -15,7 +15,7 @@ namespace HomeIrrigation.ESEvents.Common.Events
         [JsonConstructor]
         private IrrigateZoneStared(Guid aggregateGuid, string effectiveDateTime, string baseContentGuid, string description, EventMetadata metadata, int zone, int version) : this(aggregateGuid, DateTimeOffset.Parse(effectiveDateTime), metadata, zone)
         {
-            Version = version;
+            ExpectedVersion = version;
         }
 
 
