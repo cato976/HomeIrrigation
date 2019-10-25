@@ -119,7 +119,7 @@ namespace HomeIrrigation.EventStore
             try
             {
                 TimeSpan timeout = KeepReconnecting ? TimeSpan.FromSeconds(30) : TimeSpan.FromMilliseconds(-1);
-                _eventStoreConnection.AppendToStreamAsync(aggregateId.CompositeId, @event.Version, eventData).Wait(timeout);
+                _eventStoreConnection.AppendToStreamAsync(aggregateId.CompositeId, @event.ExpectedVersion, eventData).Wait(timeout);
             }
 
             catch (Exception)

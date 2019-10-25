@@ -7,15 +7,18 @@ namespace HomeIrrigation.ESEvents.Common.Events
 {
     public class IrrigateZoneStarted : Event
     {
-        public IrrigateZoneStarted(Guid aggregateGuid, DateTimeOffset effectiveDateTime, IEventMetadata metadata) : base(aggregateGuid, effectiveDateTime, metadata)
+        public IrrigateZoneStarted(Guid aggregateGuid, DateTimeOffset effectiveDateTime, IEventMetadata metadata, double howLongToIrrigate) : base(aggregateGuid, effectiveDateTime, metadata)
         {
             AggregateGuid = aggregateGuid;
+            HowLongToIrrigate = howLongToIrrigate;
         }
 
         [JsonConstructor]
-        private IrrigateZoneStarted(Guid aggregateGuid, string effectiveDateTime, string baseContentGuid, string description, EventMetadata metadata, int version) : this(aggregateGuid, DateTimeOffset.Parse(effectiveDateTime), metadata)
+        private IrrigateZoneStarted(Guid aggregateGuid, string effectiveDateTime, string baseContentGuid, string description, EventMetadata metadata, long howLongToIrrigate, int version) : this(aggregateGuid, DateTimeOffset.Parse(effectiveDateTime), metadata, howLongToIrrigate)
         {
-            Version = version;
+            ExpectedVersion = version;
         }
+
+        public double HowLongToIrrigate { get; private set; }
     }
 }

@@ -8,6 +8,6 @@ namespace HomeIrrigation.ESFramework.Common.Interfaces
         Guid AggregateGuid { get;  }
         EventMetadata Metadata { get; }
         DateTimeOffset EffectiveDateTime { get; }
-        int Version { get; }
+        long ExpectedVersion { get; }
     }
 }

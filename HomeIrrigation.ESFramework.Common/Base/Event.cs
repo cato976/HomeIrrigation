@@ -19,6 +19,6 @@ namespace HomeIrrigation.ESFramework.Common.Base
         public Guid AggregateGuid { get; set; /*protected set;*/ }
         public EventMetadata Metadata { get; }
         public DateTimeOffset EffectiveDateTime { get; }
-        public int Version { get; set; /* internal protected set;*/ }
+        public long ExpectedVersion { get; set; }
     }
 }

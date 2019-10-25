@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using HomeIrrigation.Common.Interfaces;
 using HomeIrrigation.Sprinkler.Service.Handlers;
 using HomeIrrigation.Common.CommandBus;
+using HomeIrrigation.ESEvents.Common.Events;
 
 namespace HomeIrrigation.Sprinkler.Service.Test
 {
@@ -40,7 +41,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             Configuration = builder.Build();
 
             moqEventMetadata = new Mock<IEventMetadata>();
-            moqEventMetadata.Setup(x => x.Category).Returns("Zone");
+            moqEventMetadata.Setup(x => x.Category).Returns("IRRIGATION");
             moqEventMetadata.SetupProperty(x => x.PublishedDateTime);
             moqEventMetadata.Setup(tenantId => tenantId.TenantId).Returns(Guid.NewGuid());
 
@@ -1788,6 +1789,21 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             var httpMessageHandler = new Mock<HttpMessageHandler>();
             var eventStoreMock = new Mock<IEventStore>();
             moqEventMetadata.Setup(Id => Id.TenantId).Returns(Guid.NewGuid());
+
+            var zones = new List<IEvent>();
+            var zoneId = Guid.NewGuid();
+            var tenantId = Guid.NewGuid();
+            StartIrrigationCommand cmd = new StartIrrigationCommand()
+            {
+                Zone = zoneId,
+                TenantId = tenantId
+            };
+            EventMetadata md = new EventMetadata(tenantId, "Zone", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+            zones.Add(new IrrigateZoneStarted(zoneId, DateTimeOffset.UtcNow, md, cmd.HowLongToIrrigate));
+
+            moqEventMetadata.Setup(Id => Id.TenantId).Returns(tenantId);
+            moqEventStore.Setup(found => found.GetAllEvents(It.IsAny<CompositeAggregateId>())).Returns(zones);
+
             httpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
                         ItExpr.IsAny<CancellationToken>())
@@ -1819,17 +1835,23 @@ namespace HomeIrrigation.Sprinkler.Service.Test
         }
 
         [Test]
-        public void Start_Irrigatio_Should_Send_One_Event_To_EventStore()
+        public void Start_Irrigation_Should_Send_One_Event_To_EventStore()
         {
             CommandHandlerRegistration.RegisterCommandHandler();
 
             var tenantId = Guid.NewGuid();
+            var zoneId = Guid.NewGuid();
             StartIrrigationCommand cmd = new StartIrrigationCommand()
             {
-                Zone = Guid.NewGuid(),
+                Zone = zoneId,
                 TenantId = tenantId
             };
+
+            var zones = new List<IEvent>();
             moqEventMetadata.Setup(Id => Id.TenantId).Returns(tenantId);
+            EventMetadata md = new EventMetadata(tenantId, "Zone", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+            zones.Add(new IrrigateZoneStarted(zoneId, DateTimeOffset.UtcNow, md, cmd.HowLongToIrrigate));
+            moqEventStore.Setup(found => found.GetAllEvents(It.IsAny<CompositeAggregateId>())).Returns(zones);
 
             var zone = new Domain.Zone(cmd.Zone, moqEventStore.Object);
             zone.StartIrrigation(cmd, moqEventMetadata.Object);
@@ -1841,18 +1863,25 @@ namespace HomeIrrigation.Sprinkler.Service.Test
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
-        public void Start_Irrigatio_Should_Run_For_X_Minutes(int irrigationTime)
+        public void Start_Irrigation_Should_Run_For_X_Minutes(int irrigationTime)
         {
             CommandHandlerRegistration.RegisterCommandHandler();
 
             var tenantId = Guid.NewGuid();
+            var zoneId = Guid.NewGuid();
             StartIrrigationCommand cmd = new StartIrrigationCommand()
             {
-                Zone = Guid.NewGuid(),
+                Zone = zoneId,
                 TenantId = tenantId,
                 HowLongToIrrigate = irrigationTime
             };
+            EventMetadata md = new EventMetadata(tenantId, "Zone", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+
+            var zones = new List<IEvent>();
+            zones.Add(new IrrigateZoneStarted(zoneId, DateTimeOffset.UtcNow, md, cmd.HowLongToIrrigate));
+
             moqEventMetadata.Setup(Id => Id.TenantId).Returns(tenantId);
+            moqEventStore.Setup(found => found.GetAllEvents(It.IsAny<CompositeAggregateId>())).Returns(zones);
 
             DateTimeOffset startTimer = DateTimeOffset.UtcNow;
 
@@ -1866,7 +1895,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
         }
 
         [Test]
-        public void Start_Irrigatio_Should_Send_One_Event_For_Each_Zone_To_EventStore()
+        public void Start_Irrigation_Should_Send_One_Event_For_Each_Zone_To_EventStore()
         {
             string numberJson = @"
             {

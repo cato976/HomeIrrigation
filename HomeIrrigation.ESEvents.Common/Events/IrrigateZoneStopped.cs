@@ -15,7 +15,7 @@ namespace HomeIrrigation.ESEvents.Common.Events
         [JsonConstructor]
         private IrrigateZoneStopped(Guid aggregateGuid, string effectiveDateTime, string baseContentGuid, string description, EventMetadata metadata, int version) : this(aggregateGuid, DateTimeOffset.Parse(effectiveDateTime), metadata)
         {
-            Version = version;
+            ExpectedVersion = version;
         }
     }
 }
