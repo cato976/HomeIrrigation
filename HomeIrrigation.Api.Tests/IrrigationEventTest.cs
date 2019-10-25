@@ -10,6 +10,7 @@ using System.Collections.Generic;
 
 namespace HomeIrrigation.Api.Test
 {
+    [Parallelizable(ParallelScope.Children)]
     public class IrrigationEventTest
     {
         [Test]

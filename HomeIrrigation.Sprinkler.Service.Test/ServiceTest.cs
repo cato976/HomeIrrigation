@@ -25,6 +25,7 @@ using HomeIrrigation.ESEvents.Common.Events;
 
 namespace HomeIrrigation.Sprinkler.Service.Test
 {
+    [Parallelizable(ParallelScope.Fixtures)]
     public class ServiceTest
     {
         private static IConfigurationRoot Configuration;
@@ -637,7 +638,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             var minutesToIrrigate = ir.HowLongToIrrigate(result, 0);
 
             // The lawn should be watered for 60 minutes
-            minutesToIrrigate.ShouldEqual(60);
+            minutesToIrrigate.ShouldEqual(1);
         }
 
         [Test]
@@ -1798,7 +1799,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
                 Zone = zoneId,
                 TenantId = tenantId
             };
-            EventMetadata md = new EventMetadata(tenantId, "Zone", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+            EventMetadata md = new EventMetadata(tenantId, "IRRIGATION", Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
             zones.Add(new IrrigateZoneStarted(zoneId, DateTimeOffset.UtcNow, md, cmd.HowLongToIrrigate));
 
             moqEventMetadata.Setup(Id => Id.TenantId).Returns(tenantId);
@@ -1819,7 +1820,7 @@ namespace HomeIrrigation.Sprinkler.Service.Test
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var timer = new Mock<ITimer>();
-            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient, eventStoreMock.Object, moqEventMetadata.Object.TenantId);
+            var subjectUnderTest = new SprinklerService(mockLogger.Object, timer.Object, httpClient, moqEventStore.Object, moqEventMetadata.Object.TenantId);
             timer.Raise(s => s.Elapsed += null, new object());
             DateTimeOffset now = DateTimeOffset.Now;
             var darkSkyKey = Configuration.GetSection("darkskykey").Value;
