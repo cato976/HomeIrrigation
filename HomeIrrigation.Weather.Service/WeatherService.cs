@@ -63,9 +63,9 @@ namespace HomeIrrigation.Weather.Service
                 };
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            for(int days = 0; days < 7; days++)
+            for(int days = 0; days < 8; days++)
             {
-                var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-7).ToUnixTimeSeconds();
+                var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
 
                 HttpResponseMessage response = client.GetAsync(query).Result;
 

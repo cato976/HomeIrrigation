@@ -2167,7 +2167,63 @@ namespace HomeIrrigation.Weather.Service.Test
 
             httpMessageHandler.Protected().Verify(
                     "SendAsync",
-                    Times.Exactly(7),
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-6).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-5).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-4).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-3).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-2).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-1).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == expectedUri),
+                    ItExpr.IsAny<CancellationToken>());
+            expectedUri = new Uri("https://api.darksky.net/forecast/" + darkSkyKey + "/37.8267,-122.4233" + "," + now.AddDays(-0).ToUnixTimeSeconds());
+            httpMessageHandler.Protected().Verify(
+                    "SendAsync",
+                    Times.Exactly(1),
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.Method == HttpMethod.Get
                         && req.RequestUri == expectedUri),
