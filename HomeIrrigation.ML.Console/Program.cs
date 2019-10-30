@@ -13,7 +13,10 @@ namespace HomeIrrigation.ML.Console
         static void Main(string[] args)
         {
             // Step 1 :- We need to load the training data
-            trainingData = SprinklerLab.LoadTrainingData(trainingData);
+            //trainingData = SprinklerLab.LoadTrainingData(trainingData);
+            trainingData.AddRange(SprinklerLab.ReadDataForPassXDays());
+            //System.Console.WriteLine(trainingData.Count);
+            //SprinklerLab.LoadTrainingDataFromFile(trainingData);
 
             // Step 2 :- Create object of MLContext
             var mlContext = new MLContext();
@@ -33,6 +36,7 @@ namespace HomeIrrigation.ML.Console
 
             // Step 6 :- Load the test data and run the test data to check the models accuracy
             testData = SprinklerLab.LoadTestData(testData);
+            testData = SprinklerLab.LoadTestDataFromFile(testData);
 
             IDataView testDataView = mlContext.Data.LoadFromEnumerable<FeedbackTrainingData>(testData);
 
@@ -49,14 +53,30 @@ namespace HomeIrrigation.ML.Console
             {
                 System.Console.WriteLine("Enter rainfall");
                 string feedback = System.Console.ReadLine().ToString();
+                float output;
+                float.TryParse(feedback, out output);
+                if (output == 0 && feedback != "0")
+                {
+                    strcont = feedback;
+                }
+                System.Console.WriteLine("Enter temperature");
+                string temperature = System.Console.ReadLine().ToString();
+                System.Console.WriteLine("Enter wind speed");
+                string windSpeed = System.Console.ReadLine().ToString();
 
                 var predictionFunction = mlContext.Model.CreatePredictionEngine<FeedbackTrainingData, FeedbackPrediction>(model);
 
                 var feedbackInput = new FeedbackTrainingData();
-                feedbackInput.FeedbackRainfall = float.Parse(feedback);
-                var feedbackPredicted = predictionFunction.Predict(feedbackInput);
-                System.Console.WriteLine($"TurnOnSprinklers: {feedbackPredicted.TurnOnSprinklers} | Prediction: {(System.Convert.ToBoolean(feedbackPredicted.TurnOnSprinklers) ? "Positive" : "Negative")} | Probability: {feedbackPredicted.Probability} ");
-                System.Console.WriteLine($"TurnOnSprinklers :- {feedbackPredicted.TurnOnSprinklers}");
+                try
+                {
+                    feedbackInput.FeedbackRainfall = float.Parse(feedback);
+                    feedbackInput.Temperature = float.Parse(temperature);
+                    feedbackInput.WindSpeed = float.Parse(windSpeed);
+                    var feedbackPredicted = predictionFunction.Predict(feedbackInput);
+                    System.Console.WriteLine($"TurnOnSprinklers: {feedbackPredicted.TurnOnSprinklers} | Prediction: {(System.Convert.ToBoolean(feedbackPredicted.TurnOnSprinklers) ? "Positive" : "Negative")} | Probability: {feedbackPredicted.Probability} ");
+                    System.Console.WriteLine($"TurnOnSprinklers :- {feedbackPredicted.TurnOnSprinklers}");
+                }
+                catch { }
             }
         }
     }
