@@ -63,7 +63,7 @@ namespace HomeIrrigation.Weather.Service
                 };
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            for(int days = 0; days < 8; days++)
+            for (int days = 0; days < 8; days++)
             {
                 var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
 
@@ -76,6 +76,59 @@ namespace HomeIrrigation.Weather.Service
             }
 
             return rainfall;
+        }
+
+        public void GetDataForPassXDays(double latitude, double longitude, DateTimeOffset upToNow, int numberOfDays)
+        {
+            String path = "c:\\temp\\WeatherData.txt";
+
+            var handler = new HttpClientHandler();
+
+
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback =
+                (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+                };
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+            for (int days = 0; days < numberOfDays; days++)
+            {
+                var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
+
+                HttpResponseMessage response = client.GetAsync(query).Result;
+
+                Task<string> result = response.Content.ReadAsStringAsync();
+                var data = result.Result;
+                JObject o = JObject.Parse(data);
+                // Append to file
+                // This text is added only once to the file.
+                if (!File.Exists(path))
+                {
+                    // Create a file to write to.
+                    using (StreamWriter sw = File.CreateText(path))
+                    {
+                    }
+                }
+
+                // This text is always added, making the file longer over time
+                // if it is not deleted.
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine(o);
+                }
+            }
+
+            // Open the file to read from.
+            using (StreamReader sr = File.OpenText(path))
+            {
+                string s = "";
+                while ((s = sr.ReadLine()) != null)
+                {
+                    Console.WriteLine(s);
+                }
+            }
         }
 
         private static string GetPath()

@@ -2230,6 +2230,20 @@ namespace HomeIrrigation.Weather.Service.Test
                     ItExpr.IsAny<CancellationToken>());
         }
 
+        [Test]
+        [Ignore("Used to get data")]
+        public void Get_Rainfall_In_Pass_7_Days_With_Mock_Should_Write_To_File_Weather_Data_In_Pass_100_Days()
+        { 
+            //Arrange
+            HttpClient httpClient = new HttpClient();
+
+            var subjectUnderTest = new WeatherService(httpClient);
+            DateTimeOffset now = DateTimeOffset.Now;
+
+            subjectUnderTest.GetDataForPassXDays(34.040148, -84.640035, now, 100);
+        }
+
+
         private static string GetPath()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
