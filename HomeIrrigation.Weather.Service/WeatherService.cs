@@ -93,6 +93,15 @@ namespace HomeIrrigation.Weather.Service
                 };
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
+            if (!File.Exists(path))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine("[");
+                }
+            }
+
             for (int days = 0; days < numberOfDays; days++)
             {
                 var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
@@ -104,20 +113,19 @@ namespace HomeIrrigation.Weather.Service
                 JObject o = JObject.Parse(data);
                 // Append to file
                 // This text is added only once to the file.
-                if (!File.Exists(path))
-                {
-                    // Create a file to write to.
-                    using (StreamWriter sw = File.CreateText(path))
-                    {
-                    }
-                }
-
                 // This text is always added, making the file longer over time
                 // if it is not deleted.
                 using (StreamWriter sw = File.AppendText(path))
                 {
                     sw.WriteLine(o);
+                    sw.WriteLine(",");
                 }
+                //System.Threading.Thread.Sleep(1000);
+            }
+
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine("]");
             }
 
             // Open the file to read from.

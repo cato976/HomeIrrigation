@@ -16,5 +16,10 @@
     <ProjectReference Include="..\HomeIrrigation.Sprinkler.Service\HomeIrrigation.Sprinkler.Service.csproj" />
     <ProjectReference Include="..\HomeIrrigation.Data\HomeIrrigation.Data.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
