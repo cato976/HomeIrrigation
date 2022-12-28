@@ -33,6 +33,15 @@ namespace HomeIrrigation.Weather.Service.Test
             Configuration = builder.Build();
         }
 
+        //[Test]
+        //public void Get_Current_Tempurature_Should_Return_Error()
+        //{
+            //HttpClient client = new HttpClient();
+            //WeatherService weatherService = new WeatherService(client);
+
+            //Assert.Throws<Exception>(() => weatherService.GetCurrentTempuratureF(37.8267, -122.4233));
+        //}
+
         [Test]
         public void Get_Current_Tempurature_Should_Return_Current_Tempurature()
         {

@@ -43,6 +43,11 @@ namespace HomeIrrigation.Weather.Service
             var query = weatherUrl + latitude.ToString() + "," + longitude.ToString();
             HttpResponseMessage response = client.GetAsync(query).Result;
 
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Not a successfull call");
+            }
+
             Task<string> result = response.Content.ReadAsStringAsync();
             var data = result.Result;
             JObject o = JObject.Parse(data);
