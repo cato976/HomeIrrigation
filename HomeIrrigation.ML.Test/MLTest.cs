@@ -16,7 +16,7 @@ namespace HomeIrrigation.ML.Test
             HttpClient httpClient = new HttpClient();
 
             var data = SprinklerLab.ReadDataForPassXDays();
-            Assert.AreEqual(44, data.Count);
+            Assert.AreEqual(14, data.Count);
         }
     }
 }
