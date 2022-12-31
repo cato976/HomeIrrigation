@@ -1,7 +1,8 @@
 using System;
 using HomeIrrigation.ESFramework.Common.Base;
 using HomeIrrigation.ESFramework.Common.Interfaces;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace HomeIrrigation.ESEvents.Common.Events
 {
@@ -18,6 +19,7 @@ namespace HomeIrrigation.ESEvents.Common.Events
             ExpectedVersion = version;
         }
 
+        [JsonInclude]
         public double Inches { get; private set; }
     }
 }

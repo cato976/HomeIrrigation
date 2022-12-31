@@ -9,6 +9,7 @@ using System.Net.Http;
 
 namespace HomeIrrigation.Api.Test
 {
+    [TestFixture]
     public class Tests
     {
         [SetUp]

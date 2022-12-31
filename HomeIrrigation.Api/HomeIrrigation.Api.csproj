@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>net70</TargetFramework>
   </PropertyGroup>
 
 </Project>
