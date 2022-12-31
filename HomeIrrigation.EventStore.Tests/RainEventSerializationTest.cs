@@ -3,9 +3,12 @@ using System.Text;
 using HomeIrrigation.ESEvents.Common.Events;
 using HomeIrrigation.ESFramework.Common.Base;
 using HomeIrrigation.ESFramework.Common.Interfaces;
-using Newtonsoft.Json;
+using System.Text.Json;
+//using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using System.Net.WebSockets;
+using System.Text.Json.Nodes;
 
 namespace HomeIrrigation.EventStore.Test
 {
@@ -27,25 +30,34 @@ namespace HomeIrrigation.EventStore.Test
             var metaDataJToken = parsedJObject["Metadata"];
 
             var eventMetadata = metaDataJToken.ToObject<EventMetadata>();
-            var deserializedEventData = DeserializeObject(eventDataJson, eventMetadata.CustomMetadata[EventClrTypeHeader]) as IEvent;
-            RainFell castDeserializedEvent = (RainFell)deserializedEventData;
+            //var deserializedEventData = DeserializeObject(eventDataJson, eventMetadata.CustomMetadata[EventClrTypeHeader]) as IEvent;
+            var deserializedEventData = DeserializeObject(eventDataJson, eventMetadata.CustomMetadata[EventClrTypeHeader]);
+            EventMetadata eventMetadataObject = new EventMetadata(Guid.Parse(deserializedEventData["Metadata"]["TenantId"].ToString())
+                , deserializedEventData["Metadata"]["Category"].ToString()
+                , Guid.Parse(deserializedEventData["Metadata"]["CorrelationId"].ToString())
+                , Guid.Parse(deserializedEventData["Metadata"]["CausationId"].ToString())
+                , Guid.Parse(deserializedEventData["Metadata"]["AccountGuid"].ToString()));
+            var rainFellObject = new RainFell(Guid.Parse(deserializedEventData["AggregateGuid"].ToString())
+                , DateTime.Parse(deserializedEventData["EffectiveDateTime"].ToString())
+                , eventMetadataObject, 0);
+            RainFell castDeserializedEvent = rainFellObject;
 
             Assert.IsNotNull(deserializedEventData);
-            Assert.AreEqual(serializableEvent.Metadata.AccountGuid, deserializedEventData.Metadata.AccountGuid);
-            Assert.AreEqual(serializableEvent.AggregateGuid, deserializedEventData.AggregateGuid);
-            Assert.AreEqual(serializableEvent.EffectiveDateTime, deserializedEventData.EffectiveDateTime);
-            Assert.AreNotEqual(deserializedEventData.Metadata.PublishedDateTime, DateTime.MinValue);
+            Assert.AreEqual(serializableEvent.Metadata.AccountGuid, rainFellObject.Metadata.AccountGuid);
+            Assert.AreEqual(serializableEvent.AggregateGuid, rainFellObject.AggregateGuid);
+            Assert.AreEqual(serializableEvent.EffectiveDateTime, rainFellObject.EffectiveDateTime);
+            Assert.AreNotEqual(rainFellObject.Metadata.PublishedDateTime, DateTime.MinValue);
             Assert.Greater(serializableEvent.Metadata.PublishedDateTime.DateTime, DateTime.MinValue);
         }
 
-        private static object DeserializeObject(string eventDataJson, string typeName)
+        private static JsonObject DeserializeObject(string eventDataJson, string typeName)
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject(eventDataJson, Type.GetType(typeName));
+                var obj = JsonSerializer.Deserialize<JsonObject>(eventDataJson);
                 return obj;
             }
-            catch (JsonReaderException)
+            catch (NotSupportedException)
             {
                 return null;
             }

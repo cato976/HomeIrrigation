@@ -1,14 +1,16 @@
-framework: netcoreapp2.2
+framework: net70
 source https://api.nuget.org/v3/index.json
 
 nuget Microsoft.AspNetCore.App
 nuget Microsoft.AspNetCore.Razor.Design
 nuget Microsoft.NET.Test.Sdk
+nuget Microsoft.Extensions.Logging
 nuget NUnit.Runners
-nuget NUnit
-nuget NUnit3TestAdapter
+nuget NUnit >= 3.13.3
+nuget NUnit3TestAdapter >= 4.3.1
 nuget Moq
 nuget Should
 nuget EventStore.ClientAPI.NetCore
-nuget Newtonsoft.Json
-nuget log4net
+nuget Newtonsoft.Json >= 13.0.2
+nuget System.Text.Json
+nuget log4net >= 2.0.15

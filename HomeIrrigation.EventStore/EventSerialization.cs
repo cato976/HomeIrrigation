@@ -1,10 +1,11 @@
 ﻿using EventStore.ClientAPI;
 using HomeIrrigation.ESFramework.Common.Base;
 using HomeIrrigation.ESFramework.Common.Interfaces;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Text;
+using System.Text.Json;
 
 namespace HomeIrrigation.EventStore
 {
@@ -24,9 +25,13 @@ namespace HomeIrrigation.EventStore
                 serializableEvent.Metadata.EventId =  Guid.NewGuid().ToString();
             }
 
-            serializableEvent.Metadata.CustomMetadata[EventClrTypeHeader] = serializableEvent.GetType().AssemblyQualifiedName; 
-            
-            var json = JsonConvert.SerializeObject(serializableEvent, Formatting.Indented);
+            serializableEvent.Metadata.CustomMetadata[EventClrTypeHeader] = serializableEvent.GetType().AssemblyQualifiedName;
+
+            var options = new JsonSerializerOptions
+            {
+                IncludeFields = true,
+            };
+            var json = JsonSerializer.Serialize(serializableEvent, options);
             var data = Encoding.UTF8.GetBytes(json);
             var eventName = serializableEvent.GetType().Name;
             return new EventData(Guid.Parse(serializableEvent.Metadata.EventId), eventName, true, data,null);
@@ -64,10 +69,10 @@ namespace HomeIrrigation.EventStore
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject(eventDataJson, Type.GetType(typeName));
+                var obj = JsonSerializer.Deserialize(eventDataJson, Type.GetType(typeName));
                 return obj;
             }
-            catch (JsonReaderException)
+            catch (NotSupportedException)
             {
                 return null;
             }

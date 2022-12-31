@@ -1,4 +1,5 @@
 using log4net;
+using Microsoft.Extensions.Logging;
 using HomeIrrigation.ESFramework.Common.Interfaces;
 using HomeIrrigation.ESFramework.Common.Base;
 using System.Collections.Generic;
