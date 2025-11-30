@@ -103,11 +103,11 @@ namespace HomeIrrigation.Weather.Service
             if (!File.Exists(path))
             {
                 // Create a file to write to.
-                File.CreateText(path);
+                using var sw = File.CreateText(path);
             }
 
             //var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
-            var query = weatherUrl + "latitude=" + latitude.ToString() + "&longitude=" + longitude.ToString() + "&hourly=temperature_2m,relative_humidity_2m,rain&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch&start_date=" + upToNow.AddDays(numberOfDays * -1).ToString("yyyy-MM-dd") + "&end_date=" + upToNow.ToString("yyyy-MM-dd");
+            var query = weatherUrl + "latitude=" + latitude.ToString() + "&longitude=" + longitude.ToString() + "&daily=rain_sum,temperature_2m_max,wind_speed_10m_max&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch&start_date=" + upToNow.AddDays(numberOfDays * -1).ToString("yyyy-MM-dd") + "&end_date=" + upToNow.ToString("yyyy-MM-dd");
 
             HttpResponseMessage response = client.GetAsync(query).Result;
 
