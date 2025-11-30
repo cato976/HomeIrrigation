@@ -19,7 +19,8 @@ namespace HomeIrrigation.Weather.Service
                 .AddJsonFile("appsettings.json", false, true);
             Configuration = builder.Build();
             darkSkyKey = Configuration.GetSection("darkskykey").Value;
-            weatherUrl = "https://api.darksky.net/forecast/" + darkSkyKey + "/";
+            //weatherUrl = "https://api.darksky.net/forecast/" + darkSkyKey + "/";
+            weatherUrl = "https://api.open-meteo.com/v1/forecast?";
         }
 
         HttpClient client;
@@ -39,8 +40,9 @@ namespace HomeIrrigation.Weather.Service
                     return true;
                 };
             //client = new HttpClient(handler);
+            DateTimeOffset upToNow= DateTimeOffset.UtcNow;
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            var query = weatherUrl + latitude.ToString() + "," + longitude.ToString();
+            var query = weatherUrl + "latitude=" + latitude.ToString() + "&longitude=" + longitude.ToString() + "&hourly=temperature_2m,relative_humidity_2m,rain&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch&start_date=" + upToNow.AddDays(-1).ToString("yyyy-MM-dd")+ "&end_date=" + upToNow.ToString("yyyy-MM-dd");
             HttpResponseMessage response = client.GetAsync(query).Result;
 
             if (!response.IsSuccessStatusCode)
@@ -51,7 +53,7 @@ namespace HomeIrrigation.Weather.Service
             Task<string> result = response.Content.ReadAsStringAsync();
             var data = result.Result;
             JObject o = JObject.Parse(data);
-            fahrenheit = (double)o["currently"]["temperature"];
+            fahrenheit = (double)o["hourly"]["temperature_2m"][0];
 
             return fahrenheit;
         }
@@ -68,16 +70,16 @@ namespace HomeIrrigation.Weather.Service
                 };
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            for (int days = 0; days < 8; days++)
+            var query = weatherUrl + "latitude=" + latitude.ToString() + "&longitude=" + longitude.ToString() + "&hourly=temperature_2m,relative_humidity_2m,rain&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch&start_date=" + upToNow.AddDays(-7).ToString("yyyy-MM-dd") + "&end_date=" + upToNow.ToString("yyyy-MM-dd");
+
+            HttpResponseMessage response = client.GetAsync(query).Result;
+
+            Task<string> result = response.Content.ReadAsStringAsync();
+            var data = result.Result;
+            JObject o = JObject.Parse(data);
+            foreach (var hour in o["hourly"]["rain"])
             {
-                var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
-
-                HttpResponseMessage response = client.GetAsync(query).Result;
-
-                Task<string> result = response.Content.ReadAsStringAsync();
-                var data = result.Result;
-                JObject o = JObject.Parse(data);
-                rainfall += (double)o["daily"]["data"][0]["precipIntensityMax"];
+                rainfall += (double)hour;
             }
 
             return rainfall;
@@ -101,37 +103,26 @@ namespace HomeIrrigation.Weather.Service
             if (!File.Exists(path))
             {
                 // Create a file to write to.
-                using (StreamWriter sw = File.CreateText(path))
-                {
-                    sw.WriteLine("[");
-                }
+                File.CreateText(path);
             }
 
-            for (int days = 0; days < numberOfDays; days++)
-            {
-                var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
+            //var query = weatherUrl + latitude.ToString() + "," + longitude.ToString() + "," + upToNow.AddDays(-days).ToUnixTimeSeconds();
+            var query = weatherUrl + "latitude=" + latitude.ToString() + "&longitude=" + longitude.ToString() + "&hourly=temperature_2m,relative_humidity_2m,rain&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch&start_date=" + upToNow.AddDays(numberOfDays * -1).ToString("yyyy-MM-dd") + "&end_date=" + upToNow.ToString("yyyy-MM-dd");
 
-                HttpResponseMessage response = client.GetAsync(query).Result;
+            HttpResponseMessage response = client.GetAsync(query).Result;
 
-                Task<string> result = response.Content.ReadAsStringAsync();
-                var data = result.Result;
-                JObject o = JObject.Parse(data);
-                // Append to file
-                // This text is added only once to the file.
-                // This text is always added, making the file longer over time
-                // if it is not deleted.
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine(o);
-                    sw.WriteLine(",");
-                }
-                //System.Threading.Thread.Sleep(1000);
-            }
-
+            Task<string> result = response.Content.ReadAsStringAsync();
+            var data = result.Result;
+            JObject o = JObject.Parse(data);
+            // Append to file
+            // This text is added only once to the file.
+            // This text is always added, making the file longer over time
+            // if it is not deleted.
             using (StreamWriter sw = File.AppendText(path))
             {
-                sw.WriteLine("]");
+                sw.WriteLine(o);
             }
+            //System.Threading.Thread.Sleep(1000);
 
             // Open the file to read from.
             using (StreamReader sr = File.OpenText(path))
