@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
@@ -232,13 +233,13 @@ namespace HomeIrrigation.ML
                     TurnOnSprinklers = data[i].TurnOnSprinklers
                 });
             }
-                testData.Add(new FeedbackTrainingData()
-                {
-                    FeedbackRainfall = .2F,
-                    Temperature = 73,
-                    WindSpeed = 1F,
-                    TurnOnSprinklers = true
-                });
+            testData.Add(new FeedbackTrainingData()
+            {
+                FeedbackRainfall = .2F,
+                Temperature = 73,
+                WindSpeed = 1F,
+                TurnOnSprinklers = true
+            });
 
             return testData;
         }
@@ -275,23 +276,26 @@ namespace HomeIrrigation.ML
                 {
                     if (!string.IsNullOrEmpty(s))
                     {
-                        JArray weatherEntries = JArray.Parse(s);
-                        foreach (JObject weatherEntry in weatherEntries)
+                        JObject weatherEntry = JObject.Parse(s);
+                        double rainfall = 0;
+                        for (var day = 0; day < weatherEntry["daily"]["time"].Count(); day++)
                         {
-                            var rainfall = (double)weatherEntry["daily"]["data"][0]["precipIntensityMax"];
-                            var temperature = (double)weatherEntry["daily"]["data"][0]["temperatureHigh"];
-                            var windSpeed = (double)weatherEntry["daily"]["data"][0]["windSpeed"];
-                            //Console.WriteLine($"rainfall: {rainfall}");
-                            //Console.WriteLine($"temperature: {temperature}");
-                            var trfl = rainfall < 1 && temperature > 70 && windSpeed < 5 ? true : false;
-                            //Console.WriteLine($"TurnOnSprinklers : {trfl}");
+                            var rain = (double)weatherEntry["daily"]["rain_sum"][day];
+                            var temp = (double)weatherEntry["daily"]["temperature_2m_max"][day];
+                            var windSpeed = (double)weatherEntry["daily"]["wind_speed_10m_max"][day];
                             trainingData.Add(new FeedbackTrainingData()
                             {
-                                FeedbackRainfall = (float)rainfall,
-                                Temperature = (float)temperature,
-                                TurnOnSprinklers = rainfall < 1 && temperature > 70 && windSpeed < 5 ? true : false
+                                FeedbackRainfall = (float)rain,
+                                Temperature = (float)temp,
+                                TurnOnSprinklers = rainfall < 1 && temp > 70 && windSpeed < 5 ? true : false
                             });
                         }
+                        //double temperature = (double)weatherEntry["daily"]["temperature_2m_max"][0];
+                        //var windSpeed = (double)weatherEntry["daily"]["wind_speed_10m_max"][0];
+                        //Console.WriteLine($"rainfall: {rainfall}");
+                        //Console.WriteLine($"temperature: {temperature}");
+                        //var trfl = rainfall < 1 && temperature > 70 && windSpeed < 5 ? true : false;
+                        //Console.WriteLine($"TurnOnSprinklers : {trfl}");
                     }
                     //Console.WriteLine(s);
                 }

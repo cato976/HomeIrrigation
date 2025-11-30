@@ -1,5 +1,5 @@
 bootstrapper := paket.bootstrapper.exe
-bootstrapperpath := c:/Programs/Git/Paket/.paket/
+bootstrapperpath := g:/Git/Paket/.paket/
 nupkgOutputDir := ./publish
 
 all: clean test

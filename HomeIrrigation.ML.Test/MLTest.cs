@@ -13,10 +13,10 @@ namespace HomeIrrigation.ML.Test
         [Test]
         public void ReadWeatherFile()
         {
-            HttpClient httpClient = new HttpClient();
+            //HttpClient httpClient = new HttpClient();
 
             var data = SprinklerLab.ReadDataForPassXDays();
-            Assert.AreEqual(14, data.Count);
+            Assert.AreEqual(65, data.Count);
         }
     }
 }
