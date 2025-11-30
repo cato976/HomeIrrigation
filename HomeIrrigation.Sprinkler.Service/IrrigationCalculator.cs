@@ -20,10 +20,10 @@ namespace HomeIrrigation.Sprinkler.Service
 
             minutesToIrrigate = 0;
             var totalIrrigationInches = Configuration.GetSection("TotalIrrigationInches").Value;
-            if(rainfallInPass7Days + irrigationInPass7Days < int.Parse(totalIrrigationInches))
+            if(rainfallInPass7Days + irrigationInPass7Days < float.Parse(totalIrrigationInches))
             {
                 var MinutesToIrrigateToGetOneInch = Configuration.GetSection("MinutesToIrrigateToGetOneInch").Value;
-                minutesToIrrigate = int.Parse(totalIrrigationInches) * int.Parse(MinutesToIrrigateToGetOneInch);
+                minutesToIrrigate = float.Parse(totalIrrigationInches) * int.Parse(MinutesToIrrigateToGetOneInch);
             }
 
             return minutesToIrrigate;
